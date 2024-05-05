@@ -27,6 +27,8 @@ model Products {
   category_id Int
   reviews Reviews[]
   wishlist Wishlists[]
+  cart_items Cart_items[]
+  order_items Order_Items[]
   slug String @unique
   name String
   sku String
@@ -44,6 +46,7 @@ model Users {
   reviews Reviews[]
   cart Carts?
   order Orders[]
+  address Addresses[]
   wishlist Wishlists[]
   fullname String
   email String @unique
@@ -75,6 +78,7 @@ model Cart_items {
   id Int @id @default(autoincrement())
   cart Carts @relation(fields: [cart_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   cart_id Int
+  product Products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   product_id Int
   quantity Int
   createdAt DateTime
@@ -101,15 +105,21 @@ model Stores {
   id           Int      @id @default(autoincrement())
   cart Carts[]
   store Orders[]
+  city Cities @relation(fields: [city_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  city_id Int
   name         String
   bank_name    String
   bank_account String
+  street_address String
+  province String
+  postal_code Int
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
 model Orders {
   id              Int      @id @default(autoincrement())
+  order_items Order_Items[]
   user Users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user_id         Int
   store Stores @relation(fields: [store_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -127,6 +137,19 @@ model Orders {
   updatedAt       DateTime @updatedAt
 }
 
+model Order_Items {
+  id Int @id @default(autoincrement())
+  order Orders @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  order_id Int
+  product Products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product_id Int
+  quantity Int
+  price Int
+  is_reviewed Boolean
+  createdAt DateTime
+  updatedAt DateTime
+}
+
 enum Status {
   canceled
   waiting_payment
@@ -138,10 +161,8 @@ enum Status {
 
 model Addresses {
   id             Int        @id @default(autoincrement())
-  entity_type    EntityType @default(user)
-
-  entity_id      Int
-
+  user Users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id      Int
   city Cities @relation(fields: [city_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   city_id        Int
   street_address String
@@ -149,11 +170,6 @@ model Addresses {
   postal_code    Int
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
-}
-
-enum EntityType {
-  user
-  store
 }
 
 model Wishlists {
@@ -168,7 +184,8 @@ model Wishlists {
 
 model Cities {
   id Int @id @default(autoincrement())
-  city Addresses[]
+  address Addresses[]
+  store Stores[]
   name String
   createdAt DateTime
   updatedAr DateTime
