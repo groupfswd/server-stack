@@ -12,3 +12,164 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Categories {
+  id      Int      @id @default(autoincrement())
+  products Products[]
+  name   String
+  createdAt DateTime
+  updatedAt DateTime
+}
+
+model Products {
+  id Int @id @default(autoincrement())
+  category Categories  @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  category_id Int
+  reviews Reviews[]
+  wishlist Wishlists[]
+  slug String @unique
+  name String
+  sku String
+  stock Int
+  price Int
+  weight Int
+  image String
+  description String
+  createdAt DateTime
+  updatedAt DateTime
+}
+
+model Users {
+  id Int @id @default(autoincrement())
+  reviews Reviews[]
+  cart Carts?
+  order Orders[]
+  wishlist Wishlists[]
+  fullname String
+  email String @unique
+  password String
+  phone_number String
+  role Role @default(USER)
+  createdAt DateTime
+  updatedAt DateTime
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Reviews {
+  id Int @id @default(autoincrement())
+  user Users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id Int
+  product Products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product_id Int
+  rating Int
+  comments String
+  createdAt DateTime
+  updatedAt DateTime
+}
+
+model Cart_items {
+  id Int @id @default(autoincrement())
+  cart Carts @relation(fields: [cart_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cart_id Int
+  product_id Int
+  quantity Int
+  createdAt DateTime
+  updatedAt DateTime
+}
+
+model Carts {
+  id Int @id @default(autoincrement())
+  cart_items Cart_items[]
+  user Users @relation(fields: [user_id], references: [id])
+  user_id Int @unique
+  store_id Int
+  store Stores @relation(fields: [store_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  total_price Int
+  courier String
+  total_weight Int
+  shipping_cost Int
+  shipping_method String
+  createdAt DateTime
+  updatedAt DateTime
+}
+
+model Stores {
+  id           Int      @id @default(autoincrement())
+  cart Carts[]
+  store Orders[]
+  name         String
+  bank_name    String
+  bank_account String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Orders {
+  id              Int      @id @default(autoincrement())
+  user Users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id         Int
+  store Stores @relation(fields: [store_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  store_id        Int
+  shipping_cost   Int
+  shipping_method String
+  payment_receipt String
+  paid_at         DateTime
+  total_weight    Int
+  total_price     Int
+  courier         String
+  status          Status
+  invoice         String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum Status {
+  canceled
+  waiting_payment
+  approved
+  shipping
+  delivered
+  completed
+}
+
+model Addresses {
+  id             Int        @id @default(autoincrement())
+  entity_type    EntityType @default(user)
+
+  entity_id      Int
+
+  city Cities @relation(fields: [city_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  city_id        Int
+  street_address String
+  province       String
+  postal_code    Int
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+enum EntityType {
+  user
+  store
+}
+
+model Wishlists {
+  id Int @id @default(autoincrement())
+  user Users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id Int
+  product Products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product_id Int
+  createdAt DateTime
+  updatedAt DateTime
+}
+
+model Cities {
+  id Int @id @default(autoincrement())
+  city Addresses[]
+  name String
+  createdAt DateTime
+  updatedAr DateTime
+}
