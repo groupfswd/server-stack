@@ -1,5 +1,8 @@
 const router = require("express").Router();
-const { authentication } = require("../middlewares/auth");
+const {
+    authentication,
+    authorization
+} = require("../middlewares/auth");
 // list web routers
 const addressRoute = require("./AddressRoute");
 const authRoute = require("./AuthRoute");
@@ -20,23 +23,24 @@ const productCmsRoute = require("./cms/ProductRoute");
 const storeCmsRoute = require("./cms/StoreRoute");
 const userCmsRoute = require("./cms/UserRoute");
 
-router.use("/api/auth", authRoute);
-router.use("/api/addresses", addressRoute);
-router.use("/api/carts", cartRoute);
-router.use("/api/categories", categoryRoute);
-router.use("/api/cities", cityRoute);
-router.use("/api/orders", orderRoute);
-router.use("/api/products", productRoute);
-router.use("/api/reviews", reviewRoute);
-router.use("/api/stores", storeRoute);
-router.use("/api/users", userRoute);
-router.use("/api/wishlists", wishlistRoute);
-
+router.use("/api/v1/auth", authRoute);
+router.use("/api/v1/products", productRoute);
 router.use(authentication);
-router.use("/api/cms/categories", categoryCmsRoute);
-router.use("/api/cms/orders", orderCmsRoute);
-router.use("/api/cms/products", productCmsRoute);
-router.use("/api/cms/stores", storeCmsRoute);
-router.use("/api/cms/users", userCmsRoute);
+router.use("/api/v1/addresses", addressRoute);
+router.use("/api/v1/carts", cartRoute);
+router.use("/api/v1/categories", categoryRoute);
+router.use("/api/v1/cities", cityRoute);
+router.use("/api/v1/orders", orderRoute);
+router.use("/api/v1/reviews", reviewRoute);
+router.use("/api/v1/stores", storeRoute);
+router.use("/api/v1/users", userRoute);
+router.use("/api/v1/wishlists", wishlistRoute);
+
+router.use(authorization);
+router.use("/api/v1/cms/categories", categoryCmsRoute);
+router.use("/api/v1/cms/orders", orderCmsRoute);
+router.use("/api/v1/cms/products", productCmsRoute);
+router.use("/api/v1/cms/stores", storeCmsRoute);
+router.use("/api/v1/cms/users", userCmsRoute);
 
 module.exports = router;

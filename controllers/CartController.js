@@ -1,8 +1,8 @@
 const cartService = require('../services/CartService');
 
-const findOne = (req, res, next) => {}
+const findOne = async (req, res, next) => {}
 
-const update = (req, res, next) => {}
+const update = async (req, res, next) => {}
 
 module.exports = {
     findOne,

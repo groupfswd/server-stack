@@ -7,7 +7,7 @@ const errorHandler = (err, req, res, next) => {
     } else if (err.name === "Unauthenticated"){
         res.status(400).json({name: "Unauthenticated", message: err.message || "Please Login"})
     } else if (err.name === "Unauthorized"){
-        res.status(400).json({name: "Unauthorized", message: err.message || "Forbidden"})
+        res.status(403).json({name: "Unauthorized", message: err.message || "Forbidden"})
     } else {
         res.status(500).json({message: "Internal Server Error"})
     }

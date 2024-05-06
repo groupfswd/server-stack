@@ -1,28 +1,22 @@
 const { hashPassword, validPassword } = require("../lib/bcrypt");
-const { PrismaClient } = require("@prisma/client");
 const { generateToken } = require("../lib/jwt");
-const prisma = new PrismaClient();
+const prisma = require("../lib/prisma")
 
 const register = async (params) => {
-  try {
-    const { fullname, email, password, phone_number } = params;
-    const hashedPassword = hashPassword(password);
-    const user = await prisma.users.create({
-      data: {
-        fullname,
-        email,
-        password: hashedPassword,
-        phone_number,
-      },
-    });
-    return user;
-  } catch (err) {
-    console.log(err);
-  }
+  const { fullname, email, password, phone_number } = params;
+  const hashedPassword = hashPassword(password);
+  const user = await prisma.users.create({
+    data: {
+      fullname,
+      email,
+      password: hashedPassword,
+      phone_number,
+    },
+  });
+  return user;
 };
 
 const login = async (params) => {
-  try {
     const { email, password } = params;
     const user = await prisma.users.findUnique({
       where: {
@@ -50,12 +44,7 @@ const login = async (params) => {
       role: user.role,
     });
 
-    console.log(token);
-
-    return user;
-  } catch (err) {
-    throw err;
-  }
+    return token;
 };
 
 module.exports = { login, register };

@@ -1,14 +1,14 @@
 const addressService = require('../services/AddressService');
 
-const findAll = (req, res, next) => {}
+const findAll = async (req, res, next) => {}
 
-const findOne = (req, res, next) => {}
+const findOne = async (req, res, next) => {}
 
-const create = (req, res, next) => {}
+const create = async (req, res, next) => {}
 
-const update = (req, res, next) => {}
+const update = async (req, res, next) => {}
 
-const destroy = (req, res, next) => {}
+const destroy = async (req, res, next) => {}
 
 
 module.exports = {

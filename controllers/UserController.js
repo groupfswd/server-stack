@@ -1,10 +1,10 @@
 const userService = require('../services/UserService');
 
-const findAll = (req, res, next) => {}
+const findAll = async (req, res, next) => {}
 
-const findOne = (req, res, next) => {}
+const findOne = async (req, res, next) => {}
 
-const update = (req, res, next) => {}
+const update = async (req, res, next) => {}
 
 
 module.exports = {

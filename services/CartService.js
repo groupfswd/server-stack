@@ -1,6 +1,8 @@
-const findOne = (params) => {}
+const prisma = require("../lib/prisma");
 
-const update = (params) => {}
+const findOne = async (params) => {}
+
+const update = async (params) => {}
 
 
 module.exports = {

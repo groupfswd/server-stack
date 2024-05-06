@@ -1,8 +1,8 @@
 const storeService = require('../services/StoreService');
 
-const findAll = (req, res, next) => {}
+const findAll = async (req, res, next) => {}
 
-const findOne = (req, res, next) => {}
+const findOne = async (req, res, next) => {}
 
 
 module.exports = {
