@@ -10,13 +10,13 @@ const register = async (req, res, next) => {
   }
 };
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   try {
     const userLogin = req.body;
-    const data = authService.login(userLogin);
-    res.status(200).json({ message: "Login Success", data: data });
+    await authService.login(userLogin);
+    res.status(200).json({ message: "Login Success" });
   } catch (err) {
-    throw new Error(err);
+    next(err);
   }
 };
 

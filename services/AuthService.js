@@ -30,24 +30,31 @@ const login = async (params) => {
       },
     });
     if (!user) {
-      throw new Error("User Not Found");
+      throw {
+        name: "InvalidCredentials",
+        message: "Email or password is wrong",
+      };
     }
 
     const isValidPassword = validPassword(password, user.password);
     if (!isValidPassword) {
-      throw new Error("Invalid Password");
+      throw {
+        name: "InvalidCredentials",
+        message: "Email or password is wrong",
+      };
     }
 
     const token = generateToken({
       id: user.id,
       email: user.email,
-      fullname: user.fullname,
-      exp: Math.floor(Date.now() / 1000) + 60 * 60,
+      role: user.role,
     });
-    console.log(user);
+
+    console.log(token);
+
     return user;
   } catch (err) {
-    console.log(err);
+    throw err;
   }
 };
 

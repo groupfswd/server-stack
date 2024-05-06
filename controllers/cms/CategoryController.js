@@ -21,7 +21,8 @@ const findOne = async (req, res, next) => {
 
 const create = async (req, res, next) => {
   try {
-    const categoryName = req.body.name;
+    const categoryName = req.body;
+    console.log(categoryName);
     const data = await categoryService.create(categoryName);
     res.status(201).json(data);
   } catch (err) {

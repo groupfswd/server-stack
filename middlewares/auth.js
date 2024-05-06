@@ -1,5 +1,54 @@
-const authentication = (req, res, next) => {}
+const { verifyToken } = require("../lib/jwt");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
-const authorization = (req, res, next) => {}
+const authentication = async (req, res, next) => {
+  try {
+    console.log(req.headers.authorization);
+    if (req.headers.authorization) {
+      const accessToken = req.headers.authorization.split(" ")[1];
+      const { id, email, role } = verifyToken(accessToken);
+      const user = await prisma.users.findUnique({
+        where: {
+          id: id,
+        },
+      });
 
-module.exports = {authentication, authorization}
+      if (user) {
+        req.loggedUser = {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        };
+        next();
+      } else {
+        throw {
+          name: "Unauthenticated",
+        };
+      }
+    } else {
+      throw {
+        name: "Unauthenticated",
+      };
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+const authorization = async (req, res, next) => {
+  try {
+    const { role } = req.loggedUser;
+    if (role === "admin") {
+      next();
+    } else {
+      throw {
+        name: "Unauthorized",
+      };
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { authentication, authorization };
