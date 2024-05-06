@@ -11,8 +11,8 @@ isi PORT, SECRET_KEY, DATABASE_URL
 
 npx prisma db push
 
-pilih branch sesuai fitur -> git checkout <nama-branch>
+pilih branch sesuai fitur -> git checkout [nama-branch]
 OR
-buat branch -> git branch <nama-branch>
+buat branch -> git branch [nama-branch]
 
 list branch -> git branch

@@ -16,9 +16,9 @@ datasource db {
 model Categories {
   id      Int      @id @default(autoincrement())
   products Products[]
-  name   String
-  createdAt DateTime
-  updatedAt DateTime
+  name   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Products {
@@ -30,15 +30,15 @@ model Products {
   cart_items Cart_items[]
   order_items Order_Items[]
   slug String @unique
-  name String
-  sku String
-  stock Int
-  price Int
-  weight Int
-  image String
-  description String
-  createdAt DateTime
-  updatedAt DateTime
+  name String?
+  sku String?
+  stock Int?
+  price Int?
+  weight Int?
+  image String?
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Users {
@@ -48,13 +48,13 @@ model Users {
   order Orders[]
   address Addresses[]
   wishlist Wishlists[]
-  fullname String
+  fullname String?
   email String @unique
-  password String
-  phone_number String
+  password String?
+  phone_number String?
   role Role @default(USER)
-  createdAt DateTime
-  updatedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
@@ -68,10 +68,10 @@ model Reviews {
   user_id Int
   product Products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   product_id Int
-  rating Int
-  comments String
-  createdAt DateTime
-  updatedAt DateTime
+  rating Int?
+  comments String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Cart_items {
@@ -80,9 +80,9 @@ model Cart_items {
   cart_id Int
   product Products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   product_id Int
-  quantity Int
-  createdAt DateTime
-  updatedAt DateTime
+  quantity Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Carts {
@@ -92,13 +92,13 @@ model Carts {
   user_id Int @unique
   store_id Int
   store Stores @relation(fields: [store_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  total_price Int
-  courier String
-  total_weight Int
-  shipping_cost Int
-  shipping_method String
-  createdAt DateTime
-  updatedAt DateTime
+  total_price Int?
+  courier String?
+  total_weight Int?
+  shipping_cost Int?
+  shipping_method String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Stores {
@@ -107,12 +107,12 @@ model Stores {
   store Orders[]
   city Cities @relation(fields: [city_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   city_id Int
-  name         String
-  bank_name    String
-  bank_account String
-  street_address String
-  province String
-  postal_code Int
+  name         String?
+  bank_name    String?
+  bank_account String?
+  street_address String?
+  province String?
+  postal_code Int?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -124,15 +124,15 @@ model Orders {
   user_id         Int
   store Stores @relation(fields: [store_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   store_id        Int
-  shipping_cost   Int
-  shipping_method String
-  payment_receipt String
-  paid_at         DateTime
-  total_weight    Int
-  total_price     Int
-  courier         String
-  status          Status
-  invoice         String
+  shipping_cost   Int?
+  shipping_method String?
+  payment_receipt String?
+  paid_at         DateTime @default(now())
+  total_weight    Int?
+  total_price     Int?
+  courier         String?
+  status          Status?
+  invoice         String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -143,11 +143,11 @@ model Order_Items {
   order_id Int
   product Products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   product_id Int
-  quantity Int
-  price Int
-  is_reviewed Boolean
-  createdAt DateTime
-  updatedAt DateTime
+  quantity Int?
+  price Int?
+  is_reviewed Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Status {
@@ -165,9 +165,9 @@ model Addresses {
   user_id      Int
   city Cities @relation(fields: [city_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   city_id        Int
-  street_address String
-  province       String
-  postal_code    Int
+  street_address String?
+  province       String?
+  postal_code    Int?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 }
@@ -178,8 +178,8 @@ model Wishlists {
   user_id Int
   product Products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   product_id Int
-  createdAt DateTime
-  updatedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Cities {
@@ -187,6 +187,6 @@ model Cities {
   address Addresses[]
   store Stores[]
   name String
-  createdAt DateTime
-  updatedAr DateTime
+  createdAt DateTime @default(now())
+  updatedAr DateTime @updatedAt
 }
