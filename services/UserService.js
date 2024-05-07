@@ -9,7 +9,7 @@ const findAll = async () => {
 
 const findOne = async (params) => {
     const user = await prisma.users.findUnique({
-        where: { id: params }
+        where: { id: parseInt(params.id) }
     })
 
     return user;
@@ -18,7 +18,7 @@ const findOne = async (params) => {
 const update = async (params) => {
     if (params.data.password) {
         const hashedPassword = await hashPassword(params.data.password)
-        
+
         params.data = { ...params.data, password: hashedPassword };
     }
 

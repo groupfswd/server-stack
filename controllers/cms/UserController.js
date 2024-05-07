@@ -12,7 +12,9 @@ const findAll = async (req, res, next) => {
 
 const findOne = async (req, res, next) => {
     try {
-        const data = await userService.findOne(parseInt(req.params.id))
+        const params = req.params
+
+        const data = await userService.findOne(params)
 
         res.status(200).json({ message: 'Get User By Id Successful', data })
     } catch (err) {

@@ -12,9 +12,7 @@ const findAll = async (req, res, next) => {
 
 const findOne = async (req, res, next) => {
     try {
-        const { id } = req.loggedUser
-        
-        const data = await userService.findOne(id)
+        const data = await userService.findOne(req.loggedUser)
 
         res.status(200).json({ message: 'Get User By Id Successful', data })
     } catch (err) {
