@@ -3,6 +3,6 @@ const userController = require("../controllers/UserController")
 
 router.get("/", userController.findAll)
 router.get("/:id", userController.findOne)
-router.put("/", userController.update)
+router.put("/:id", userController.update)
 
 module.exports = router
