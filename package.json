@@ -1,8 +1,9 @@
 {
   "scripts": {
-    "dev": "nodemon app.js",
-    "create-cities": "node scripts/create-cities.js",
-    "update-cities": "node scripts/update-cities.js"
+    "dev": "nodemon app.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
     "@prisma/client": "^5.12.1",
