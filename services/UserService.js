@@ -24,7 +24,6 @@ const update = async (params) => {
     const user = await prisma.users.update({
         where: { id: params.id },
         data: params.body
-
     })
 
     return user;
