@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "nodemon app.js",
-    "create-cities": "node ./scripts/create-cities.js",
+    "create-cities": "node scripts/create-cities.js",
     "update-cities": "node scripts/update-cities.js"
   },
   "dependencies": {
