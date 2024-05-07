@@ -16,14 +16,15 @@ const findOne = async (params) => {
 }
 
 const update = async (params) => {
-    if (params.body.password) {
-        const hashedPassword = await hashPassword(params.body.password)
-        params.body = { ...params.body, password: hashedPassword };
+    if (params.data.password) {
+        const hashedPassword = await hashPassword(params.data.password)
+        
+        params.data = { ...params.data, password: hashedPassword };
     }
 
     const user = await prisma.users.update({
-        where: { id: params.id },
-        data: params.body
+        where: { id: params.user.id },
+        data: params.data
     })
 
     return user;

@@ -12,9 +12,7 @@ const findAll = async (req, res, next) => {
 
 const findOne = async (req, res, next) => {
     try {
-        const id = parseInt(req.params.id)
-
-        const data = await userService.findOne(id)
+        const data = await userService.findOne(parseInt(req.params.id))
 
         res.status(200).json({ message: 'Get User By Id Successful', data })
     } catch (err) {
@@ -24,10 +22,12 @@ const findOne = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
-        const { id } = req.loggedUser
-        const body = req.body
+        const params = {
+            user: req.loggedUser,
+            data: req.body
+        }
 
-        await userService.update({ id, body })
+        await userService.update(params)
 
         res.status(200).json({ message: 'Update User Successful' })
     } catch (err) {
