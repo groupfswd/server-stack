@@ -2,6 +2,9 @@
   "scripts": {
     "dev": "nodemon app.js"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "dependencies": {
     "@prisma/client": "^5.12.1",
     "axios": "^1.6.8",
