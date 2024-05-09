@@ -8,7 +8,9 @@ const findAll = async (params) => {
         name,
         sku,
         price,
-        weight
+        weight,
+        page,
+        limit
     } = params;
 
     let filterOptions = {
@@ -63,14 +65,35 @@ const findAll = async (params) => {
         ...weightFilter
     }
 
-    const product = await prisma.products.findMany({
+    let skip = (page - 1) * limit;
+    
+    let take = limit;
+
+    const products = await prisma.products.findMany({
         ...filterOptions,
         include: {
             category: true,
         },
+        skip: skip,
+        take: take
     });
 
-    return product;
+    console.log(products.length, "<<<< length");
+
+    console.log(take, "<<<< take");
+
+    const hasMoreData = take === products.length;
+
+    const nextPage = hasMoreData ? page + 1 : null;
+
+    const prevPage = page > 1 ? page - 1 : null
+
+    return {
+        data: products,
+        nextPage,
+        currentPage: page,
+        prevPage
+    };
 }
 
 const findOneSlug = async (params) => {

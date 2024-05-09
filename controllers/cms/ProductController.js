@@ -1,8 +1,15 @@
 const productService = require('../../services/ProductService');
+const DEFAULT_PAGE = 1
+const DEFAULT_LIMIT = 20
 
 const findAll = async (req, res, next) => {
     try {
-        const data = await productService.findAll(req.query);
+        const params = {
+            ...req.query,
+            page: +req.query.page || DEFAULT_PAGE,
+            limit: +req.query.limit || DEFAULT_LIMIT
+        }
+        const data = await productService.findAll(params);
 
         res.status(200).json({ message: 'Get Data Products', data });
     } catch (error) {
