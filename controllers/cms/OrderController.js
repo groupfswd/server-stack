@@ -21,9 +21,6 @@ const findOne = async (req, res, next) => {
   }
 };
 
-// apakah admin bisa membuat order?
-const create = async (req, res, next) => {};
-
 const update = async (req, res, next) => {
   // isinya update status order
 };

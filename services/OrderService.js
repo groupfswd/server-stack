@@ -1,42 +1,20 @@
 const prisma = require("../lib/prisma");
 
 const findAll = async (params) => {
-  try {
-    if (params.role === "ADMIN") {
-      const data = await prisma.orders.findMany();
-      return data;
-    } else {
-      const data = await prisma.orders.findMany({
-        where: {
-          user_id: +params.id,
-        },
-      });
-      return data;
-    }
-  } catch (err) {
-    throw err;
-  }
+  const data = await prisma.orders.findMany();
+  return data;
+
+  // add pagination
 };
 
 const findOne = async (params) => {
-  try {
-    const data = await prisma.orders.findFirst({
-      where: {
-        id: +params.id,
-      },
-    });
+  const data = await prisma.orders.findFirst({
+    where: {
+      id: +params.id,
+    },
+  });
 
-    if (data?.user_id !== params.user.id && params.user.role !== "ADMIN") {
-      throw {
-        name: "Unauthorized",
-        message: "You are not authorized to access this resource",
-      };
-    } else {
-      return data;
-    }
-  } catch (err) {
-    throw err;
-  }
+  return data;
 };
 
 const create = async (params) => {
