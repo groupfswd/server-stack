@@ -13,7 +13,25 @@ const findAll = async (params) => {
   }
 };
 
-const findOne = async (params) => {};
+const findOne = async (params) => {
+  try {
+    const data = await prisma.orders.findFirst({
+      where: {
+        id: +params.id,
+      },
+    });
+    if (data.user_id !== params.user_id) {
+      throw {
+        name: "Unauthorized",
+        message: "You are not authorized to access this resource",
+      };
+    } else {
+      return data;
+    }
+  } catch (err) {
+    throw err;
+  }
+};
 
 const create = async (params) => {};
 

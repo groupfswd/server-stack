@@ -3,6 +3,7 @@ const orderService = require("../services/OrderService");
 const findAll = async (req, res, next) => {
   try {
     const id = req.loggedUser.id;
+    console.log(id);
     const data = await orderService.findAll(parseInt(id));
     res.status(200).json(data);
   } catch (err) {
@@ -10,7 +11,16 @@ const findAll = async (req, res, next) => {
   }
 };
 
-const findOne = async (req, res, next) => {};
+const findOne = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const user_id = req.loggedUser.id;
+    const data = await orderService.findOne({ id, user_id });
+    res.status(200).json(data);
+  } catch (err) {
+    next(err);
+  }
+};
 
 const create = async (req, res, next) => {};
 
