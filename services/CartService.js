@@ -23,7 +23,12 @@ const update = async (params) => {
       id: params.id,
     },
     data: {
-      quantity: params.quantity,
+      cart_items: {
+        update: {
+          product: params.product,
+          quantity: params.quantity,
+        },
+      },
     },
     include: {
       cart_items: {
