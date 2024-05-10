@@ -26,9 +26,9 @@ const findOne = async (req, res, next) => {
 
 const create = async (req, res, next) => {
   try {
-    const user_id = req.loggedUser.id;
+    const user = req.loggedUser;
     const order = req.body;
-    const data = await orderService.create({ user_id, order });
+    const data = await orderService.create({ user, order });
     res.status(201).json({ message: "Success", data: data });
   } catch (err) {
     next(err);
@@ -39,7 +39,15 @@ const update = async (req, res, next) => {
   try {
     const id = req.params.id;
     const filePath = req.body;
-    const data = await orderService.update({ id, filePath });
+    const data = await orderService.update({
+      where: {
+        id: +id,
+      },
+      data: {
+        payment_receipt: filePath.path,
+        paid_at: new Date().toISOString(),
+      },
+    });
     res.status(200).json({ message: "Update Success", data: data });
   } catch (err) {
     next(err);

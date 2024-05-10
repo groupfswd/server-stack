@@ -1,5 +1,5 @@
 const prisma = require("../lib/prisma");
-const path = require("path");
+const { sendInvoiceEmail } = require("../lib/nodemailer");
 
 const findAll = async (params) => {
   const data = await prisma.orders.findMany(params);
@@ -21,7 +21,7 @@ const create = async (params) => {
   return prisma.$transaction(async (tx) => {
     const order = await tx.orders.create({
       data: {
-        user_id: params.user_id,
+        user_id: params.user.id,
         store_id: params.order.store_id,
         shipping_cost: params.order.shipping_cost,
         shipping_method: params.order.shipping_method,
@@ -43,22 +43,14 @@ const create = async (params) => {
     });
     const orderItem = await tx.order_Items.createMany({ data });
 
-    // send invoice
+    sendInvoiceEmail(params.user.email);
 
     return { order, orderItem };
   });
 };
 
 const update = async (params) => {
-  const data = await prisma.orders.update({
-    where: {
-      id: +params.id,
-    },
-    data: {
-      payment_receipt: params.filePath.path,
-      paid_at: new Date().toISOString(),
-    },
-  });
+  const data = await prisma.orders.update(params);
   return data;
 };
 

@@ -20,7 +20,19 @@ const findOne = async (req, res, next) => {
 };
 
 const update = async (req, res, next) => {
-  // isinya update status order
+  try {
+    const id = req.params.id;
+    const status = req.body;
+    const data = await orderService.update({
+      where: {
+        id: +id,
+      },
+      data: {
+        status: status,
+      },
+    });
+    res.status(200).json({ message: "Update Success", data: data });
+  } catch (err) {}
 };
 
 module.exports = {
