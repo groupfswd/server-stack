@@ -12,7 +12,7 @@ const findOne = async (params) => {
       },
     });
 
-    if (!data) throw new Error("Data Not Found");
+    if (!data) throw {name: "ErrorNotFound", message: "Data Category Not Found"};
     return data;
 };
 
@@ -39,7 +39,15 @@ const update = async (id, params) => {
     return data;
 };
 
-const destroy = async (params) => {};
+const destroy = async (params) => {
+  await findOne(+params);
+  const data = await prisma.categories.delete({
+    where:{
+      id: +params
+    }
+  })
+  return data;
+};
 
 module.exports = {
   findAll,
