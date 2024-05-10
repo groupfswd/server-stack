@@ -1,9 +1,9 @@
 const prisma = require("../lib/prisma");
 
-const findOne = async (params) => {
+const findOne = async (req) => {
   const cart = await prisma.carts.findUnique({
     where: {
-      id: params.id,
+      id: req.loggedUser.id,
     },
     include: {
       cart_items: {
@@ -17,16 +17,16 @@ const findOne = async (params) => {
   return cart;
 };
 
-const update = async (params) => {
+const update = async (req) => {
   const cart = await prisma.carts.update({
     where: {
-      id: params.id,
+      id: req.loggedUser.id,
     },
     data: {
       cart_items: {
         update: {
-          product: params.product,
-          quantity: params.quantity,
+          product: req.body.product,
+          quantity: req.body.quantity,
         },
       },
     },

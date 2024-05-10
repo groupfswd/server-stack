@@ -2,23 +2,24 @@ const cartService = require("../services/CartService");
 
 const findOne = async (req, res, next) => {
   try {
-    const cart = await cartService.findOne({ id: req.params.id });
+    const cart = await cartService.findOne({
+      loggedUser: { id: req.loggedUser.id },
+    });
     return res.json(cart);
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
 
 const update = async (req, res, next) => {
   try {
     const cart = await cartService.update({
-      id: req.params.id,
-      product: req.body.product,
-      quantity: req.body.quantity,
+      loggedUser: { id: req.loggedUser.id },
+      body: req.body,
     });
     return res.json(cart);
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
 
