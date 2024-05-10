@@ -26,12 +26,12 @@ model Products {
   category    Categories    @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   category_id Int
   reviews     Reviews[]
-  wishlist    Wishlists[]
+  wishlists   Wishlists[]
   cart_items  Cart_items[]
   order_items Order_Items[]
   slug        String        @unique
-  name        String
-  sku         String
+  name        String        @unique
+  sku         String        @unique
   stock       Int
   price       Int
   weight      Int

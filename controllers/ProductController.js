@@ -11,7 +11,7 @@ const findAll = async (req, res, next) => {
         }
         const data = await productService.findAll(params);
 
-        res.status(200).json({ message: 'Get All Data Product', data});
+        res.status(200).json({ message: 'Get Data Products', result: data});
     } catch (error) {
         next(error)
     }
@@ -19,9 +19,9 @@ const findAll = async (req, res, next) => {
 
 const findOne = async (req, res, next) => {
     try {
-        const data = await productService.findOneSlug(req.params.slug)
+        const data = await productService.findOne(req.params.param)
 
-        res.status(200).json({ message: 'Get Product By Slug', data})
+        res.status(200).json({ message: 'Get Product By Id Or Slug', data})
     } catch (error) {
         next(error)
     }
