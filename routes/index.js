@@ -1,8 +1,11 @@
 const router = require("express").Router();
-const {
-    authentication,
-    authorization
-} = require("../middlewares/auth");
+const { authentication, authorization } = require("../middlewares/auth");
+const storage = require("../lib/multer");
+
+router.post("/api/v1/upload", storage.single("image"), (req, res) => {
+  res.send(req.file);
+  console.log(req.file);
+});
 // list web routers
 const addressRoute = require("./AddressRoute");
 const authRoute = require("./AuthRoute");

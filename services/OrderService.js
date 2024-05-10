@@ -1,7 +1,8 @@
 const prisma = require("../lib/prisma");
+const path = require("path");
 
 const findAll = async (params) => {
-  const data = await prisma.orders.findMany();
+  const data = await prisma.orders.findMany(params);
   return data;
 
   // add pagination
@@ -10,93 +11,55 @@ const findAll = async (params) => {
 const findOne = async (params) => {
   const data = await prisma.orders.findFirst({
     where: {
-      id: +params.id,
+      id: +params,
     },
   });
-
   return data;
 };
 
 const create = async (params) => {
-  try {
-    const data = await prisma.orders.create({
+  return prisma.$transaction(async (tx) => {
+    const order = await tx.orders.create({
       data: {
         user_id: params.user_id,
-        store_id: params.store_id,
-        shipping_cost: params.shipping_cost,
-        shipping_method: params.shipping_method,
-        total_weight: params.total_weight,
-        total_price: params.total_price,
-        courier: params.courier,
+        store_id: params.order.store_id,
+        shipping_cost: params.order.shipping_cost,
+        shipping_method: params.order.shipping_method,
+        total_weight: params.order.total_weight,
+        total_price: params.order.total_price,
+        paid_at: new Date().toISOString(),
+        courier: params.order.courier,
         invoice: "test file invoce",
       },
     });
 
-    const orderItems = params.cart_items.map((item) => ({
-      order_id: data.id,
-      product_id: item.product.id,
-      quantity: item.quantity,
-      price: item.product.price,
-    }));
-
-    await prisma.order_Items.createMany({
-      data: orderItems,
+    const data = params.order.order_items.map((item) => {
+      return {
+        order_id: order.id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price: item.price,
+      };
     });
+    const orderItem = await tx.order_Items.createMany({ data });
 
-    await prisma.carts.update({
-      where: {
-        id: params.id,
-      },
-      data: {
-        total_price: null,
-        courier: null,
-        total_weight: null,
-        shipping_cost: null,
-        shipping_method: null,
-      },
-    });
+    // send invoice
 
-    await prisma.cart_items.deleteMany({
-      where: {
-        cart_id: params.id,
-      },
-    });
-
-    return data;
-  } catch (err) {
-    throw err;
-  }
+    return { order, orderItem };
+  });
 };
 
 const update = async (params) => {
-  // isinya upload bukti pembayaran ke column payment_receipt
-};
-
-const getDataFromCart = async (params) => {
-  try {
-    const data = await prisma.carts.findFirst({
-      where: {
-        user_id: +params,
-      },
-      include: {
-        cart_items: {
-          select: {
-            quantity: true,
-            product: {
-              select: {
-                id: true,
-                price: true,
-                weight: true,
-              },
-            },
-          },
-        },
-      },
-    });
-    return data;
-  } catch (err) {
-    throw err;
-  }
+  const data = await prisma.orders.update({
+    where: {
+      id: +params.id,
+    },
+    data: {
+      payment_receipt: params.filePath.path,
+      paid_at: new Date().toISOString(),
+    },
+  });
+  return data;
 };
 
 module.exports = {
@@ -104,5 +67,4 @@ module.exports = {
   findOne,
   create,
   update,
-  getDataFromCart,
 };

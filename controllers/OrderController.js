@@ -2,8 +2,12 @@ const orderService = require("../services/OrderService");
 
 const findAll = async (req, res, next) => {
   try {
-    const user = req.loggedUser;
-    const data = await orderService.findAll(user);
+    const id = req.loggedUser.id;
+    const data = await orderService.findAll({
+      where: {
+        user_id: +id,
+      },
+    });
     res.status(200).json(data);
   } catch (err) {
     next(err);
@@ -13,8 +17,7 @@ const findAll = async (req, res, next) => {
 const findOne = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const user = req.loggedUser;
-    const data = await orderService.findOne({ id, user });
+    const data = await orderService.findOne(id);
     res.status(200).json(data);
   } catch (err) {
     next(err);
@@ -24,15 +27,24 @@ const findOne = async (req, res, next) => {
 const create = async (req, res, next) => {
   try {
     const user_id = req.loggedUser.id;
-    const cartData = await orderService.getDataFromCart(user_id);
-    const data = await orderService.create(cartData);
+    const order = req.body;
+    const data = await orderService.create({ user_id, order });
     res.status(201).json({ message: "Success", data: data });
   } catch (err) {
     next(err);
   }
 };
 
-const update = async (req, res, next) => {};
+const update = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const filePath = req.body;
+    const data = await orderService.update({ id, filePath });
+    res.status(200).json({ message: "Update Success", data: data });
+  } catch (err) {
+    next(err);
+  }
+};
 
 module.exports = {
   findAll,

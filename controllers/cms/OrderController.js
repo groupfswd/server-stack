@@ -2,8 +2,7 @@ const orderService = require("../../services/OrderService");
 
 const findAll = async (req, res, next) => {
   try {
-    const user = req.loggedUser;
-    const data = await orderService.findAll(user);
+    const data = await orderService.findAll();
     res.status(200).json(data);
   } catch (err) {
     next(err);
@@ -13,8 +12,7 @@ const findAll = async (req, res, next) => {
 const findOne = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const user = req.loggedUser;
-    const data = await orderService.findOne({ id, user });
+    const data = await orderService.findOne(id);
     res.status(200).json(data);
   } catch (err) {
     next(err);
@@ -28,6 +26,5 @@ const update = async (req, res, next) => {
 module.exports = {
   findAll,
   findOne,
-  create,
   update,
 };
