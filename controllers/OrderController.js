@@ -46,6 +46,7 @@ const update = async (req, res, next) => {
       data: {
         payment_receipt: filePath.path,
         paid_at: new Date().toISOString(),
+        status: "waiting_approval",
       },
     });
     res.status(200).json({ message: "Update Success", data: data });

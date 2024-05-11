@@ -153,6 +153,7 @@ model Order_Items {
 enum Status {
   cancelled
   waiting_payment
+  waiting_approval
   approved
   shipping
   delivered
