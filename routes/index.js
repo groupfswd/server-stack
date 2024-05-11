@@ -1,8 +1,11 @@
+const express = require('express');
 const router = require("express").Router();
 const {
     authentication,
     authorization
 } = require("../middlewares/auth");
+const path = require('path');
+
 // list web routers
 const addressRoute = require("./AddressRoute");
 const authRoute = require("./AuthRoute");
@@ -25,6 +28,7 @@ const userCmsRoute = require("./cms/UserRoute");
 
 router.use("/api/v1/auth", authRoute);
 router.use("/api/v1/products", productRoute);
+router.use("/api/v1/images", express.static(path.join(__dirname, "../public/uploads")))
 router.use(authentication);
 router.use("/api/v1/addresses", addressRoute);
 router.use("/api/v1/carts", cartRoute);
