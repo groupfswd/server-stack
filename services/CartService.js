@@ -22,9 +22,37 @@ const update = async (params) => {
     where: { id: params.body.product },
   });
 
+  if (product.stock < params.body.quantity) {
+    throw new Error("Stock Insufficient");
+  }
+
   const totalWeight = product.weight * params.body.quantity;
 
   const totalPrice = product.price * params.body.quantity;
+
+  const cartcourier = await prisma.carts.findUnique({
+    where: {
+      id: params.loggedUser.id,
+      courier: true,
+    },
+  });
+
+  if (!cartcourier) {
+    throw new Error("Error Not Found");
+  }
+
+  const user = await prisma.users.findUnique({
+    where: {
+      id: params.loggedUser.id,
+    },
+    include: {
+      addresses: true,
+    },
+  });
+
+  if (!user) {
+    throw new Error("Error Not Found");
+  }
 
   const cart = await prisma.carts.update({
     where: {
