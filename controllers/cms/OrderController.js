@@ -1,4 +1,3 @@
-const { query } = require("express");
 const orderService = require("../../services/OrderService");
 const MAX_ITEM_COUNT = 100;
 
