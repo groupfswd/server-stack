@@ -1,5 +1,6 @@
 const prisma = require("../lib/prisma");
 const { sendInvoiceEmail } = require("../lib/nodemailer");
+const { createPdf } = require("../lib/pdfkit");
 
 const findAll = async (params) => {
   const data = await prisma.orders.findMany(params);
@@ -27,9 +28,7 @@ const create = async (params) => {
         shipping_method: params.order.shipping_method,
         total_weight: params.order.total_weight,
         total_price: params.order.total_price,
-        paid_at: new Date().toISOString(),
         courier: params.order.courier,
-        invoice: "test file invoce",
       },
     });
 
@@ -43,9 +42,20 @@ const create = async (params) => {
     });
     const orderItem = await tx.order_Items.createMany({ data });
 
-    sendInvoiceEmail(params.user.email);
+    const pdfUrl = await createPdf(orderItem);
 
-    return { order, orderItem };
+    await tx.orders.update({
+      where: {
+        id: order.id,
+      },
+      data: {
+        invoice: pdfUrl,
+      },
+    });
+
+    await sendInvoiceEmail(params.user.email, pdfUrl);
+
+    return { order, orderItem, pdfUrl };
   });
 };
 
