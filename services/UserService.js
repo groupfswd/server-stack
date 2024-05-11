@@ -12,10 +12,18 @@ const findOne = async (params) => {
         where: { id: parseInt(params.id) }
     })
 
+    if (!user) {
+        throw { name: 'ErrorNotFound' }
+    }
+
     return user;
 }
 
 const update = async (params) => {
+    if (!params.user) {
+        throw { name: 'ErrorNotFound' }
+    }
+
     if (params.data.password) {
         const hashedPassword = await hashPassword(params.data.password)
 
