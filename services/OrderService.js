@@ -3,10 +3,34 @@ const { sendInvoiceEmail } = require("../lib/nodemailer");
 const { createPdf } = require("../lib/pdfkit");
 
 const findAll = async (params) => {
-  const data = await prisma.orders.findMany(params);
-  return data;
+  console.log(params);
+  const { skip, page, take } = params.query;
+  return prisma.$transaction(async (tx) => {
+    const data = await tx.orders.findMany({
+      skip: skip,
+      take: take,
+      where: params.action.where,
+      orderBy: params.action.orderBy,
+    });
 
-  // add pagination
+    const count = await tx.orders.count({
+      where: params.action.where,
+    });
+
+    console.log(count);
+    let totalPage = Math.ceil(count / take);
+    let prevPage = page - 1 === 0 ? null : page - 1;
+    let nextPage = page + 1 > totalPage ? null : page + 1;
+
+    console.log(totalPage);
+    return {
+      data: data,
+      prevPage: prevPage,
+      currentPag: page,
+      nextPage: nextPage,
+      totalPage: totalPage,
+    };
+  });
 };
 
 const findOne = async (params) => {
@@ -60,6 +84,7 @@ const create = async (params) => {
 };
 
 const update = async (params) => {
+  console.log(params);
   const data = await prisma.orders.update(params);
   return data;
 };

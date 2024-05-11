@@ -1,13 +1,23 @@
 const orderService = require("../services/OrderService");
+const MAX_ITEM_COUNT = 10;
 
 const findAll = async (req, res, next) => {
   try {
     const id = req.loggedUser.id;
-    const data = await orderService.findAll({
+    const query = {
+      skip: +req.query.skip,
+      page: +req.query.page,
+      take: MAX_ITEM_COUNT,
+    };
+    const body = req.body;
+    const action = {
       where: {
-        user_id: +id,
+        user_id: id,
+        ...body.filter,
       },
-    });
+      orderBy: body.sort,
+    };
+    const data = await orderService.findAll({ query, action });
     res.status(200).json(data);
   } catch (err) {
     next(err);
@@ -38,13 +48,13 @@ const create = async (req, res, next) => {
 const update = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const filePath = req.body;
+    const body = req.body;
     const data = await orderService.update({
       where: {
         id: +id,
       },
       data: {
-        payment_receipt: filePath.path,
+        payment_receipt: body.path,
         paid_at: new Date().toISOString(),
         status: "waiting_approval",
       },
