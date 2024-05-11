@@ -1,3 +1,4 @@
+const paginate = require("../lib/pagination");
 const prisma = require("../lib/prisma");
 const slugify = require('slugify')
 
@@ -7,6 +8,7 @@ const findAll = async (params) => {
         slug,
         name,
         sku,
+        status,
         price,
         weight,
         page,
@@ -22,6 +24,7 @@ const findAll = async (params) => {
     let slugFilter = {};
     let nameFilter = {};
     let skuFilter = {};
+    let statusFilter = {};
     let priceFilter = {};
     let weightFilter = {};
 
@@ -37,13 +40,22 @@ const findAll = async (params) => {
 
     if (name)
         nameFilter = {
-            name: `${name}`
+            name: {
+                equals: `%${name}%`,
+                mode: 'insensitive'
+            }
         }
 
     if (sku)
         skuFilter = {
             sku: `${sku}`
         }
+    
+    if(status){
+        statusFilter = {
+            status: 'active'
+        }
+    }
 
     if (price)
         priceFilter = {
@@ -58,6 +70,7 @@ const findAll = async (params) => {
     filterOptions.where = {
         ...categoriesIdFilter,
         ...slugFilter,
+        ...statusFilter,
         ...nameFilter,
         ...skuFilter,
         ...priceFilter,
@@ -82,37 +95,32 @@ const findAll = async (params) => {
         })
     ])
 
-    const totalPages = count / limit;
+    const data = paginate({result, count, limit, page})
 
-    const nextPage = page + 1 <= totalPages ? page + 1 : null;
-
-    const prevPage = page > 1 ? page - 1 : null
-
-    return {
-        data: result,
-        nextPage,
-        currentPage: page,
-        totalPages,
-        prevPage
-    };
+    return data;
 }
 
 const findOne = async (params) => {
     const isNumeric = (string) => /^[+-]?\d+(\.\d+)?$/.test(string)
-    let product;
-    if(isNumeric(params) === false){
-        product = await prisma.products.findUnique({
-            where: {
-                slug: params
-            }
-        });
+    const filterOption = {}
+    if(isNumeric(params.id) === false){
+        filterOption.where = {
+            slug: params.id
+        }
     } else {
-        product = await prisma.products.findUnique({
-            where: {
-                id: +params
-            }
-        });
+        filterOption.where = {
+            id: +params.id
+        }
     }
+
+    if(params.status){
+        filterOption.where = {
+            ...filterOption.where,
+            status: "active"
+        }
+    }
+
+    const product = await prisma.products.findUnique(filterOption);
 
     if (!product) {
         throw {
@@ -125,6 +133,17 @@ const findOne = async (params) => {
 }
 
 const create = async (params) => {
+    const category = await prisma.categories.findUnique({
+        where: {
+            id: +params.category_id
+        }
+    })
+    if(!category){
+        throw {
+            name: "ErrorNotFound",
+            message: "Category Not Found"
+        }
+    }
     const product = await prisma.products.create({
         data: {
             category_id: +params.category_id,
@@ -189,9 +208,12 @@ const destroy = async (params) => {
         }
     }
 
-    const product = await prisma.products.delete({
+    const product = await prisma.products.update({
         where: {
             id: +params
+        },
+        data: {
+            status: 'inactive'
         }
     })
 

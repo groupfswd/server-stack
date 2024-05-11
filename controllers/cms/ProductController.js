@@ -19,7 +19,7 @@ const findAll = async (req, res, next) => {
 
 const findOne = async (req, res, next) => {
     try {
-        const data = await productService.findOne(req.params.param)
+        const data = await productService.findOne(req.params)
 
         res.status(200).json({ message: 'Get Product By Id Or Slug', data })
     } catch (error) {

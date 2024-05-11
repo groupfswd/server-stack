@@ -29,6 +29,7 @@ model Products {
   wishlists   Wishlists[]
   cart_items  Cart_items[]
   order_items Order_Items[]
+  status      StatusActivity @default(active)
   slug        String        @unique
   name        String        @unique
   sku         String        @unique
@@ -39,6 +40,11 @@ model Products {
   description String?
   created_at  DateTime      @default(now())
   updated_at  DateTime      @default(now()) @updatedAt
+}
+
+enum StatusActivity {
+  active
+  inactive
 }
 
 model Users {

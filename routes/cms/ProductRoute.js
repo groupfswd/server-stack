@@ -3,7 +3,7 @@ const productController = require("../../controllers/cms/ProductController")
 const multer = require('../../lib/multer')
 
 router.get("/", productController.findAll)
-router.get("/:param", productController.findOne)
+router.get("/:id", productController.findOne)
 router.post("/", productController.create)
 router.post("/upload", multer,productController.upload)
 router.put("/:id", productController.update)

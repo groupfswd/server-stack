@@ -2,6 +2,6 @@ const router = require('express').Router();
 const productController = require("../controllers/ProductController")
 
 router.get("/", productController.findAll)
-router.get("/:param", productController.findOne)
+router.get("/:id", productController.findOne)
 
 module.exports = router
