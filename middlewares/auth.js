@@ -1,5 +1,5 @@
 const { verifyToken } = require("../lib/jwt");
-const prisma = require("../lib/prisma")
+const prisma = require("../lib/prisma");
 
 const authentication = async (req, res, next) => {
   try {
@@ -37,7 +37,7 @@ const authentication = async (req, res, next) => {
 const authorization = async (req, res, next) => {
   try {
     const { role } = req.loggedUser;
-    if (role === "admin") {
+    if (role === "ADMIN") {
       next();
     } else {
       throw {

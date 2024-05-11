@@ -6,15 +6,18 @@ const findAll = async (params) => {
 };
 
 const findOne = async (params) => {
-  const data = await prisma.stores.findUnique({
-    where: {
-      id: params,
-    },
-  });
-  if (!data) {
-    throw Error;
+  try {
+    const { id } = params;
+    const data = await prisma.stores.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+    });
+    return data;
+  } catch (error) {
+    console.error("Error in findOne:", error);
+    throw error;
   }
-  return data;
 };
 
 const create = async (params) => {
@@ -28,11 +31,6 @@ const create = async (params) => {
       postal_code: params.postal_code,
     },
   });
-  if (!data) {
-    throw {
-      message: "error data not found",
-    };
-  }
   return data;
 };
 
@@ -55,14 +53,16 @@ const update = async (id, params) => {
 };
 
 const destroy = async (params) => {
+  const result = await prisma.stores.findUnique({
+    where: { id: +params },
+  });
+
   const data = await prisma.stores.destroy({
     where: {
-      id: params.id,
+      id: result.id,
     },
   });
-  if (!data) {
-    throw Error;
-  }
+
   return data;
 };
 
