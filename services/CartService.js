@@ -30,14 +30,14 @@ const update = async (params) => {
 
   const totalPrice = product.price * params.body.quantity;
 
-  const cartcourier = await prisma.carts.findUnique({
+  const cartCourier = await prisma.carts.findUnique({
     where: {
       id: params.loggedUser.id,
       courier: true,
     },
   });
 
-  if (!cartcourier) {
+  if (!cartCourier) {
     throw new Error("Error Not Found");
   }
 
