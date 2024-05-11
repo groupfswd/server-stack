@@ -40,7 +40,6 @@ const create = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
-        console.log(req.params.id);
         const data = { 
             id: req.params.id,
             data: req.body
