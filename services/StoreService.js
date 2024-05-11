@@ -6,18 +6,20 @@ const findAll = async (params) => {
 };
 
 const findOne = async (params) => {
-  try {
-    const { id } = params;
-    const data = await prisma.stores.findUnique({
-      where: {
-        id: parseInt(id),
-      },
-    });
-    return data;
-  } catch (error) {
-    console.error("Error in findOne:", error);
-    throw error;
+  const { id } = params;
+  const data = await prisma.stores.findUnique({
+    where: {
+      id: parseInt(id),
+    },
+  });
+
+  if (!data) {
+    throw {
+      name: "ErrorNotFound",
+      message: "data not found",
+    };
   }
+  return data;
 };
 
 const create = async (params) => {
@@ -28,36 +30,45 @@ const create = async (params) => {
       bank_name: params.bank_name,
       street_address: params.street_address,
       province: params.province,
-      postal_code: params.postal_code,
+      postal_code: +params.postal_code,
     },
   });
   return data;
 };
 
-const update = async (id, params) => {
-  await findOne(id);
-  const data = await prisma.stores.update({
+const update = async ({ id, data }) => {
+  const findOne = await prisma.stores.findUnique({
     where: {
-      id: params.id,
+      id,
+    },
+  });
+  if (!findOne) {
+    throw { name: "ErrorNotFound" };
+  }
+  const result = await prisma.stores.update({
+    where: {
+      id,
     },
     data: {
-      city_id: params.city_id,
-      name: params.name,
-      bank_name: params.bank_name,
-      street_address: params.street_address,
-      province: params.province,
-      postal_code: params.postal_code,
+      city_id: data.city_id,
+      name: data.name,
+      bank_name: data.bank_name,
+      street_address: data.street_address,
+      province: data.province,
+      postal_code: +data.postal_code,
     },
   });
-  return data;
+  return result;
 };
 
-const destroy = async (params) => {
+const destroy = async (id) => {
   const result = await prisma.stores.findUnique({
-    where: { id: +params },
+    where: { id: +id },
   });
-
-  const data = await prisma.stores.destroy({
+  if (!result) {
+    throw { name: "ErrorNotFound" };
+  }
+  const data = await prisma.stores.delete({
     where: {
       id: result.id,
     },

@@ -11,10 +11,8 @@ const findAll = async (req, res, next) => {
 
 const findOne = async (req, res, next) => {
   try {
-    const data = await storeService.findOne(req.param.id);
-    if (!data) {
-      return res.status(404).json({ message: "data not found" });
-    }
+    console.log(req.params.id);
+    const data = await storeService.findOne(req.params);
     res.json(data);
   } catch (err) {
     next(err);
@@ -35,11 +33,8 @@ const update = async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-
-    const updateData = await storeService.update(id, data, { new: true });
-    if (!updateData) {
-      return res.status(404).json({ message: "data not found" });
-    }
+    const params = { id: +id, data };
+    const updateData = await storeService.update(params);
     res.json(updateData);
   } catch (err) {
     next(err);
@@ -50,9 +45,6 @@ const destroy = async (req, res, next) => {
   try {
     const { id } = req.params;
     const deleteData = await storeService.destroy(id);
-    if (!deleteData) {
-      return res.status(404).json({ message: "delete failure" });
-    }
     res.json({ message: "data deleted succesfuly" });
   } catch (err) {
     next(err);
