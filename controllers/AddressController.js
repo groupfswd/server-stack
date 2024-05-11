@@ -12,7 +12,11 @@ const findAll = async (req, res, next) => {
 
 const findOne = async (req, res, next) => {
     try {
-        const data = await addressService.findOne(req.params.id)
+        const params = {
+            user_id: req.loggedUser.id,
+            id: req.params.id
+        }
+        const data = await addressService.findOne(params)
 
         res.status(200).json({ message: 'Get Address By Id Success', data})
     } catch (error) {
@@ -22,7 +26,11 @@ const findOne = async (req, res, next) => {
 
 const create = async (req, res, next) => {
     try {
-        const data = await addressService.create(req.body);
+        const params = {
+            user_id: req.loggedUser.id,
+            params: req.body
+        }
+        const data = await addressService.create(params);
 
         res.status(201).json({ message: 'Successfully create address', data})
     } catch (error) {

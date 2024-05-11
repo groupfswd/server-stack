@@ -2,27 +2,21 @@ const prisma = require("../lib/prisma");
 
 const findAll = async (params) => {
     const user_id = +params;
-    const addresses = await prisma.addresses.findFirst({
+    const addresses = await prisma.addresses.findMany({
         where: {
             user_id: user_id
         }
     })
 
-    if(!addresses){
-        throw {
-            name: "ErrorNotFound",
-            message: "Data Address User Not Found"
-        }
-    }
-
     return addresses;
 }
 
 const findOne = async (params) => {
-    const id = +params
+    const {id, user_id} = params
     const address = await prisma.addresses.findUnique({
         where: {
-            id: id
+            id: +id,
+            user_id
         }
     })
 
@@ -36,10 +30,22 @@ const findOne = async (params) => {
     return address;
 }
 
-const create = async (params) => {
+const create = async ({user_id, params}) => {
+    const city = await prisma.cities.findUnique({
+        where: {
+            id: +params.city_id
+        }
+    })
+
+    if(!city){
+        throw {
+            name: "ErrorNotFound",
+            message: "City Not Found"
+        }
+    }
     const address = await prisma.addresses.create({
         data: {
-            user_id: params.user_id,
+            user_id: user_id,
             city_id: params.city_id,
             street_address: params.street_address,
             province: params.province,
@@ -47,12 +53,6 @@ const create = async (params) => {
         }
     });
 
-    if (!address) {
-        throw {
-            name: "ErrorNotFound",
-            message: "Data Not Found"
-        }
-    }
     return address;
 }
 
@@ -73,7 +73,6 @@ const update = async (params) => {
     const address = await prisma.addresses.update({
         where: { id: +params.id },
         data: {
-            user_id: params.data.user_id,
             city_id: params.data.city_id,
             street_address: params.data.street_address,
             province: params.data.province,
