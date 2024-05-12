@@ -3,7 +3,6 @@ const { sendInvoiceEmail } = require("../lib/nodemailer");
 const { createPdf } = require("../lib/pdfkit");
 
 const findAll = async (params) => {
-  console.log(params);
   const { skip, page, take } = params.query;
   return prisma.$transaction(async (tx) => {
     const data = await tx.orders.findMany({
@@ -16,8 +15,6 @@ const findAll = async (params) => {
     const count = await tx.orders.count({
       where: params.action.where,
     });
-
-    console.log(count);
     let totalPage = Math.ceil(count / take);
     let prevPage = page - 1 === 0 ? null : page - 1;
     let nextPage = page + 1 > totalPage ? null : page + 1;
@@ -64,9 +61,31 @@ const create = async (params) => {
         price: item.price,
       };
     });
-    const orderItem = await tx.order_Items.createMany({ data });
+    await tx.order_Items.createMany({ data });
 
-    const pdfUrl = await createPdf(orderItem);
+    const invoiceData = await tx.orders.findFirst({
+      where: {
+        id: order.id,
+      },
+      include: {
+        user: true,
+        store: true,
+        order_items: {
+          include: {
+            product: {
+              select: {
+                name: true,
+                weight: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    console.log(invoiceData);
+
+    const pdfUrl = await createPdf(invoiceData);
 
     await tx.orders.update({
       where: {
@@ -79,7 +98,7 @@ const create = async (params) => {
 
     await sendInvoiceEmail(params.user.email, pdfUrl);
 
-    return { order, orderItem, pdfUrl };
+    return { order, invoiceData };
   });
 };
 

@@ -33,7 +33,7 @@ const findOne = async (req, res, next) => {
     next(err);
   }
 };
-
+``;
 const create = async (req, res, next) => {
   try {
     const user = req.loggedUser;
