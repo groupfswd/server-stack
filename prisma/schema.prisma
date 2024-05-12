@@ -26,12 +26,13 @@ model Products {
   category    Categories    @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   category_id Int
   reviews     Reviews[]
-  wishlist    Wishlists[]
+  wishlists   Wishlists[]
   cart_items  Cart_items[]
   order_items Order_Items[]
+  status      StatusActivity @default(active)
   slug        String        @unique
-  name        String
-  sku         String
+  name        String        @unique
+  sku         String        @unique
   stock       Int
   price       Int
   weight      Int
@@ -39,6 +40,11 @@ model Products {
   description String?
   created_at  DateTime      @default(now())
   updated_at  DateTime      @default(now()) @updatedAt
+}
+
+enum StatusActivity {
+  active
+  inactive
 }
 
 model Users {

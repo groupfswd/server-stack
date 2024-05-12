@@ -8,6 +8,10 @@ const errorHandler = (err, req, res, next) => {
         res.status(400).json({name: "Unauthenticated", message: err.message || "Please Login"})
     } else if (err.name === "Unauthorized"){
         res.status(403).json({name: "Unauthorized", message: err.message || "Forbidden"})
+    } else if (err.code === "P2002") {
+        res.status(400).json({name: "UniqueConstraintError", message: err.message || "UniqueConstraint Error"})
+    } else if (err.name === "PrismaClientValidationError") {
+        res.status(400).json({name: "PrismaClientValidationError", message: err.message || "PrismaClientValidationError Error"})
     } else {
         res.status(500).json({message: "Internal Server Error"})
     }
