@@ -6,6 +6,10 @@ const errorHandler = (err, req, res, next) => {
         res.status(400).json({name: "Invalid Credentials", message: err.message || "Something Went Wrong"})
     } else if (err.name === "Unauthenticated"){
         res.status(400).json({name: "Unauthenticated", message: err.message || "Please Login"})
+    } else if (err.name === "StockInsufficient") {
+        res.status(400).json({ message: "Stock Not Enough" });
+    } else if (err.name === "InvalidPrice") {
+        res.status(400).json({ message: "Wrong Price" });
     } else if (err.name === "Unauthorized"){
         res.status(403).json({name: "Unauthorized", message: err.message || "Forbidden"})
     } else if (err.code === "P2002") {

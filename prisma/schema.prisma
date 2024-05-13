@@ -87,6 +87,7 @@ model Cart_items {
   product    Products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   product_id Int
   quantity   Int?
+  price       Int?
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
 }
@@ -96,8 +97,8 @@ model Carts {
   cart_items      Cart_items[]
   user            Users        @relation(fields: [user_id], references: [id])
   user_id         Int          @unique
-  store_id        Int
-  store           Stores       @relation(fields: [store_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  store_id        Int?
+  store           Stores?       @relation(fields: [store_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   total_price     Int?
   courier         String?
   total_weight    Int?
