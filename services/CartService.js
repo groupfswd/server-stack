@@ -40,7 +40,7 @@ const update = async (params) => {
 
     for (let i = 0; i < cart_items_attributes.length; i++) {
       const currentProduct = cart_items_attributes[i];
-      console.log(currentProduct);
+      
       const foundProduct = await tx.products.findUnique({
         where: { id: currentProduct.product_id },
       });
