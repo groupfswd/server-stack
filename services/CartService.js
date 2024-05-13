@@ -13,134 +13,109 @@ const findOne = async (params) => {
 };
 
 const update = async (params) => {
-  const {
-    shipping_cost,
-    courier,
-    shipping_method,
-    store_id,
-    cart_items_attributes,
-  } = params.body;
-
-  let totalWeight = 0;
-
-  let totalPrice = 0;
-
-  console.log (typeof params.loggedUser.id)
-
-  const cart = await prisma.carts.update({
-    where: {
-      user_id: params.loggedUser.id,
-    },
-    data: {
+  return prisma.$transaction(async (tx) => {
+    const {
       shipping_cost,
       courier,
       shipping_method,
       store_id,
-    },
-  });
+      cart_items_attributes,
+    } = params.body;
 
-  for (let i = 0; i < cart_items_attributes.length; i++) {
-    const currentProduct = cart_items_attributes[i];
-    console.log(currentProduct);
-    const foundProduct = await prisma.products.findUnique({
-      where: { id: currentProduct.product_id },
-    });
-    if (!foundProduct) {
-      throw { name: "ErrorNotFound" };
-    }
+    let totalWeight = 0;
 
-    if (foundProduct.stock < currentProduct.quantity) {
-      throw { name: "StockInsufficient" };
-    }
+    let totalPrice = 0;
 
-    if (foundProduct.price !== +currentProduct.price){
-      throw { name: "InvalidPrice"}
-    }
-
-    const currentWeight = foundProduct.weight * currentProduct.quantity;
-
-    totalWeight += currentWeight;
-
-    const currentPrice = foundProduct.price * currentProduct.quantity;
-
-    totalPrice += currentPrice;
-
-    await prisma.cart_items.upsert({
+    let cart = await tx.carts.update({
       where: {
-        cart_id: cart.id,
-        product_id: foundProduct.id
+        user_id: params.loggedUser.id,
       },
-      update: {
-        quantity: +currentProduct.quantity,
-        price: +currentProduct.price
+      data: {
+        shipping_cost,
+        courier,
+        shipping_method,
+        store_id,
       },
-      create: {
-        quantity: +currentProduct.quantity,
-        price: +currentProduct.price
+    });
+
+    for (let i = 0; i < cart_items_attributes.length; i++) {
+      const currentProduct = cart_items_attributes[i];
+      console.log(currentProduct);
+      const foundProduct = await tx.products.findUnique({
+        where: { id: currentProduct.product_id },
+      });
+      if (!foundProduct) {
+        throw { name: "ErrorNotFound" };
       }
-    })
-  }
 
-  // const product = await prisma.products.findUnique({
-  //   where: { id: params.body.product },
-  // });
+      if (foundProduct.stock < currentProduct.quantity) {
+        throw { name: "StockInsufficient" };
+      }
 
-  // if (product.stock < params.body.quantity) {
-  //   throw new Error("Stock Insufficient");
-  // }
+      if (foundProduct.price !== +currentProduct.price) {
+        throw { name: "InvalidPrice" };
+      }
 
-  // const totalWeight = product.weight * params.body.quantity;
+      const currentWeight = foundProduct.weight * currentProduct.quantity;
 
-  // const totalPrice = product.price * params.body.quantity;
+      totalWeight += currentWeight;
 
-  // const cartCourier = await prisma.carts.findUnique({
-  //   where: {
-  //     user_id: params.loggedUser.id,
-  //     courier: true,
-  //   },
-  // });
+      const currentPrice = foundProduct.price * currentProduct.quantity;
 
-  // if (!cartCourier) {
-  //   throw new Error("Error Not Found");
-  // }
+      totalPrice += currentPrice;
 
-  // const user = await prisma.users.findUnique({
-  //   where: {
-  //     user_id: params.loggedUser.id,
-  //   },
-  //   include: {
-  //     addresses: true,
-  //   },
-  // });
+      const cartItem = await tx.cart_items.findFirst({
+        where: {
+          AND: [{ product_id: foundProduct.id }, { cart_id: cart.id }],
+        },
+      });
 
-  // if (!user) {
-  //   throw new Error("Error Not Found");
-  // }
+      if (cartItem) {
+        //update
+        await tx.cart_items.update({
+          where: {
+            id: cartItem.id,
+          },
+          data: {
+            quantity: +currentProduct.quantity,
+            price: +currentProduct.price,
+          },
+        });
+      } else {
+        //create
+        await tx.cart_items.create({
+          data: {
+            quantity: +currentProduct.quantity,
+            price: +currentProduct.price,
+            cart: {
+              connect: {
+                id: cart.id,
+              },
+            },
+            product: {
+              connect: {
+                id: foundProduct.id,
+              },
+            },
+          },
+        });
+      }
 
-  // const cart = await prisma.carts.update({
-  //   where: {
-  //     id: params.loggedUser.id,
-  //   },
-  //   data: {
-  //     cart_items: {
-  //       update: {
-  //         product: params.body.product,
-  //         quantity: params.body.quantity,
-  //       },
-  //     },
-  // //     total_weight: totalWeight,
-  //     total_price: totalPrice,
-  //   },
-  //   include: {
-  //     cart_items: {
-  //       select: {
-  //         product: true,
-  //         quantity: true,
-  //       },
-  //     },
-  //   },
-  // });
-  return cart;
+      cart = await tx.carts.update({
+        where: {
+          id: cart.id,
+        },
+        data: {
+          total_price: totalPrice,
+          total_weight: totalWeight,
+        },
+        include: {
+          cart_items: true,
+        },
+      });
+    }
+    return cart;
+  });
 };
 
 module.exports = {
