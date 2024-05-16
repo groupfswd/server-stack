@@ -138,6 +138,7 @@ model Orders {
   total_price     Int?
   courier         String?
   status          Status?       @default(waiting_payment)
+  delivered_at    DateTime?
   invoice         String?       
   created_at      DateTime      @default(now())
   updated_at      DateTime      @default(now()) @updatedAt

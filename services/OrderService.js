@@ -83,8 +83,6 @@ const create = async (params) => {
       },
     });
 
-    console.log(invoiceData);
-
     const pdfUrl = await createPdf(invoiceData);
 
     await tx.orders.update({
