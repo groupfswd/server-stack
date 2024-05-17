@@ -87,7 +87,7 @@ model Cart_items {
   product    Products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   product_id Int
   quantity   Int?
-  price       Int?
+  price      Int?
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
 }
@@ -170,6 +170,7 @@ enum Status {
 
 model Addresses {
   id             Int      @id @default(autoincrement())
+  title          String
   user           Users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user_id        Int
   city           Cities   @relation(fields: [city_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
