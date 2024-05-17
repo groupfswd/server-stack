@@ -22,12 +22,6 @@ const orderCmsRoute = require("./cms/OrderRoute");
 const productCmsRoute = require("./cms/ProductRoute");
 const storeCmsRoute = require("./cms/StoreRoute");
 const userCmsRoute = require("./cms/UserRoute");
-const multerMiddleware = require("../lib/multer");
-
-router.post("/api/v1/upload", multerMiddleware, (req, res) => {
-  res.send(req.file);
-  console.log(req.file);
-});
 
 router.use("/api/v1/auth", authRoute);
 router.use("/api/v1/products", productRoute);

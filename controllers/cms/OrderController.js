@@ -1,21 +1,16 @@
 const orderService = require("../../services/OrderService");
-const MAX_ITEM_COUNT = 100;
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 50;
 
 const findAll = async (req, res, next) => {
   try {
     const query = {
-      skip: +req.query.skip,
-      page: +req.query.page,
-      take: MAX_ITEM_COUNT,
+      page: +req.query.page || DEFAULT_PAGE,
+      limit: +req.query.limit || DEFAULT_LIMIT,
+      query: req.query,
     };
-    const body = req.body;
-    const action = {
-      where: {
-        ...body.filter,
-      },
-      orderBy: body.sort,
-    };
-    const data = await orderService.findAll({ query, action });
+
+    const data = await orderService.findAll(query);
     res.status(200).json(data);
   } catch (err) {
     next(err);
@@ -24,8 +19,10 @@ const findAll = async (req, res, next) => {
 
 const findOne = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const data = await orderService.findOne(id);
+    const params = {
+      id: +req.params.id,
+    };
+    const data = await orderService.findOne(params);
     res.status(200).json(data);
   } catch (err) {
     next(err);
@@ -34,16 +31,15 @@ const findOne = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const status = req.body;
-    const data = await orderService.update({
-      where: {
-        id: +id,
-      },
-      data: status,
-    });
+    const params = {
+      id: +req.params.id,
+      status: req.body.status,
+    };
+    const data = await orderService.update(params);
     res.status(200).json({ message: "Update Success", data: data });
-  } catch (err) {}
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {

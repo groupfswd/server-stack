@@ -1,23 +1,18 @@
 const orderService = require("../services/OrderService");
-const MAX_ITEM_COUNT = 10;
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 15;
 
 const findAll = async (req, res, next) => {
   try {
     const id = req.loggedUser.id;
     const query = {
-      skip: +req.query.skip,
-      page: +req.query.page,
-      take: MAX_ITEM_COUNT,
+      page: +req.query.page || DEFAULT_PAGE,
+      limit: +req.query.limit || DEFAULT_LIMIT,
+      query: req.query,
+      user_id: id,
     };
-    const body = req.body;
-    const action = {
-      where: {
-        user_id: id,
-        ...body.filter,
-      },
-      orderBy: body.sort,
-    };
-    const data = await orderService.findAll({ query, action });
+
+    const data = await orderService.findAll(query);
     res.status(200).json(data);
   } catch (err) {
     next(err);
@@ -26,8 +21,11 @@ const findAll = async (req, res, next) => {
 
 const findOne = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const data = await orderService.findOne(id);
+    const params = {
+      id: +req.params.id,
+      user_id: req.loggedUser.id,
+    };
+    const data = await orderService.findOne(params);
     res.status(200).json(data);
   } catch (err) {
     next(err);
@@ -37,8 +35,8 @@ const findOne = async (req, res, next) => {
 const create = async (req, res, next) => {
   try {
     const user = req.loggedUser;
-    const order = req.body;
-    const data = await orderService.create({ user, order });
+    const payload = req.body;
+    const data = await orderService.create({ user, payload });
     res.status(201).json({ message: "Success", data: data });
   } catch (err) {
     next(err);
@@ -47,19 +45,28 @@ const create = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const body = req.body;
-    const data = await orderService.update({
-      where: {
-        id: +id,
-      },
-      data: {
-        payment_receipt: body.path,
-        paid_at: new Date().toISOString(),
-        status: "waiting_approval",
-      },
-    });
+    const params = {
+      id: req.params.id,
+      status: req.body.status,
+    };
+    const data = await orderService.update(params);
     res.status(200).json({ message: "Update Success", data: data });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const pay = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const file = req.file;
+
+    const params = {
+      id,
+      file,
+    };
+    const data = await orderService.pay(params);
+    res.status(200).json({ message: "Payment Uploaded", data });
   } catch (err) {
     next(err);
   }
@@ -70,4 +77,5 @@ module.exports = {
   findOne,
   create,
   update,
+  pay,
 };
