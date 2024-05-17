@@ -87,7 +87,7 @@ model Cart_items {
   product    Products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   product_id Int
   quantity   Int?
-  price       Int?
+  price      Int?
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
 }
@@ -134,12 +134,13 @@ model Orders {
   shipping_cost   Int?
   shipping_method String?
   payment_receipt String?
-  paid_at         DateTime      @default(now())
+  paid_at         DateTime?
   total_weight    Int?
   total_price     Int?
   courier         String?
-  status          Status?
-  invoice         String?
+  status          Status?       @default(waiting_payment)
+  delivered_at    DateTime?
+  invoice         String?       
   created_at      DateTime      @default(now())
   updated_at      DateTime      @default(now()) @updatedAt
 }
@@ -160,6 +161,7 @@ model Order_Items {
 enum Status {
   cancelled
   waiting_payment
+  waiting_approval
   approved
   shipping
   delivered
@@ -168,6 +170,7 @@ enum Status {
 
 model Addresses {
   id             Int      @id @default(autoincrement())
+  title          String
   user           Users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user_id        Int
   city           Cities   @relation(fields: [city_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
