@@ -45,34 +45,15 @@ const create = async (params) => {
 
 const update = async (params) => {
   const { id, body } = params;
+  const { rating, comments } = body;
+
   const review = await prisma.reviews.update({
     where: {
       id: parseInt(id),
     },
     data: {
-      ...body,
-    },
-  });
-  return review;
-};
-
-  const { body } = params;
-  const review = await prisma.reviews.create({
-    data: {
-      ...body,
-    },
-  });
-  return review;
-};
-
-const update = async (params) => {
-  const { id, body } = params;
-  const review = await prisma.reviews.update({
-    where: {
-      id: parseInt(id),
-    },
-    data: {
-      ...body,
+      rating,
+      comments,
     },
   });
   return review;
