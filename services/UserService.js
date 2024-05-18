@@ -1,11 +1,42 @@
 const prisma = require("../lib/prisma");
+const { hashPassword } = require('../lib/bcrypt')
 
-const findAll = async (params) => {}
+const findAll = async () => {
+    const users = await prisma.users.findMany()
 
-const findOne = async (params) => {}
+    return users;
+}
 
-const update = async (params) => {}
+const findOne = async (params) => {
+    const user = await prisma.users.findUnique({
+        where: { id: parseInt(params.id) }
+    })
 
+    if (!user) {
+        throw { name: 'ErrorNotFound' }
+    }
+
+    return user;
+}
+
+const update = async (params) => {
+    if (!params.user) {
+        throw { name: 'ErrorNotFound' }
+    }
+
+    if (params.data.password) {
+        const hashedPassword = await hashPassword(params.data.password)
+
+        params.data = { ...params.data, password: hashedPassword };
+    }
+
+    const user = await prisma.users.update({
+        where: { id: params.user.id },
+        data: params.data
+    })
+
+    return user;
+}
 
 module.exports = {
     findAll,

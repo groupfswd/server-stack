@@ -26,12 +26,13 @@ model Products {
   category    Categories    @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   category_id Int
   reviews     Reviews[]
-  wishlist    Wishlists[]
+  wishlists   Wishlists[]
   cart_items  Cart_items[]
   order_items Order_Items[]
+  status      StatusActivity @default(active)
   slug        String        @unique
-  name        String
-  sku         String
+  name        String        @unique
+  sku         String        @unique
   stock       Int
   price       Int
   weight      Int
@@ -39,6 +40,11 @@ model Products {
   description String?
   created_at  DateTime      @default(now())
   updated_at  DateTime      @default(now()) @updatedAt
+}
+
+enum StatusActivity {
+  active
+  inactive
 }
 
 model Users {
@@ -81,6 +87,7 @@ model Cart_items {
   product    Products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   product_id Int
   quantity   Int?
+  price      Int?
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
 }
@@ -90,8 +97,8 @@ model Carts {
   cart_items      Cart_items[]
   user            Users        @relation(fields: [user_id], references: [id])
   user_id         Int          @unique
-  store_id        Int
-  store           Stores       @relation(fields: [store_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  store_id        Int?
+  store           Stores?       @relation(fields: [store_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   total_price     Int?
   courier         String?
   total_weight    Int?
@@ -127,12 +134,13 @@ model Orders {
   shipping_cost   Int?
   shipping_method String?
   payment_receipt String?
-  paid_at         DateTime      @default(now())
+  paid_at         DateTime?
   total_weight    Int?
   total_price     Int?
   courier         String?
-  status          Status?
-  invoice         String?
+  status          Status?       @default(waiting_payment)
+  delivered_at    DateTime?
+  invoice         String?       
   created_at      DateTime      @default(now())
   updated_at      DateTime      @default(now()) @updatedAt
 }
@@ -153,6 +161,7 @@ model Order_Items {
 enum Status {
   cancelled
   waiting_payment
+  waiting_approval
   approved
   shipping
   delivered
@@ -161,6 +170,7 @@ enum Status {
 
 model Addresses {
   id             Int      @id @default(autoincrement())
+  title          String
   user           Users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user_id        Int
   city           Cities   @relation(fields: [city_id], references: [id], onDelete: Cascade, onUpdate: Cascade)

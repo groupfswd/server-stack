@@ -56,6 +56,28 @@ const update = async (params) => {
   return review;
 };
 
+  const { body } = params;
+  const review = await prisma.reviews.create({
+    data: {
+      ...body,
+    },
+  });
+  return review;
+};
+
+const update = async (params) => {
+  const { id, body } = params;
+  const review = await prisma.reviews.update({
+    where: {
+      id: parseInt(id),
+    },
+    data: {
+      ...body,
+    },
+  });
+  return review;
+};
+
 const destroy = async (params) => {
   const { id } = params;
   const review = await prisma.reviews.delete({
