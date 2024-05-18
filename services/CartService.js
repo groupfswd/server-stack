@@ -1,4 +1,5 @@
 const prisma = require("../lib/prisma");
+const axios = require("axios");
 
 const findOne = async (params) => {
   const cart = await prisma.carts.findUnique({
@@ -40,7 +41,7 @@ const update = async (params) => {
 
     for (let i = 0; i < cart_items_attributes.length; i++) {
       const currentProduct = cart_items_attributes[i];
-      
+
       const foundProduct = await tx.products.findUnique({
         where: { id: currentProduct.product_id },
       });
@@ -118,7 +119,46 @@ const update = async (params) => {
   });
 };
 
+const getShippingCost = async (params) => {
+  const { weight, destination_id, origin_id, courier } = params;
+
+  const destination = await prisma.cities.findUnique({
+    where: {
+      id: +destination_id,
+    },
+  });
+
+  const origin = await prisma.cities.findUnique({
+    where: {
+      id: +origin_id,
+    },
+  });
+
+  if (!["jne", "pos", "tiki"].includes(courier)) {
+    throw { name: ErrorNotFound, message: "Courier not found" };
+  }
+
+  const shipping_cost = await axios({
+    url: "https://api.rajaongkir.com/starter/cost",
+    method: "POST",
+    data: {
+      weight: +weight,
+      destination: destination.id,
+      origin: origin.id,
+      courier,
+    },
+    headers: {
+      key: process.env.RAJAONGKIR_API_KEY,
+    },
+  });
+
+  const cost_lists = shipping_cost.data.rajaongkir.results[0].costs;
+
+  return cost_lists;
+};
+
 module.exports = {
   findOne,
   update,
+  getShippingCost,
 };
