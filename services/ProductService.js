@@ -5,9 +5,7 @@ const slugify = require('slugify')
 const findAll = async (params) => {
     let {
         category_id,
-        slug,
-        name,
-        sku,
+        search,
         status,
         price,
         weight,
@@ -21,9 +19,7 @@ const findAll = async (params) => {
     }
 
     let categoriesIdFilter = {};
-    let slugFilter = {};
-    let nameFilter = {};
-    let skuFilter = {};
+    let searchFilter = {};
     let statusFilter = {};
     let priceFilter = {};
     let weightFilter = {};
@@ -33,22 +29,22 @@ const findAll = async (params) => {
             category_id: +category_id
         }
 
-    if (slug)
-        slugFilter = {
-            slug: `${slug}`
-        }
-
-    if (name)
-        nameFilter = {
-            name: {
-                equals: `%${name}%`,
-                mode: 'insensitive'
-            }
-        }
-
-    if (sku)
-        skuFilter = {
-            sku: `${sku}`
+    if (search)
+        searchFilter = {
+            OR: [
+                {
+                    name: {
+                        equals: `%${search}%`,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    sku: `${search}`
+                },
+                {
+                    slug: `${search}`
+                }
+            ]
         }
     
     if(status){
@@ -69,10 +65,8 @@ const findAll = async (params) => {
 
     filterOptions.where = {
         ...categoriesIdFilter,
-        ...slugFilter,
+        ...searchFilter,
         ...statusFilter,
-        ...nameFilter,
-        ...skuFilter,
         ...priceFilter,
         ...weightFilter
     }
