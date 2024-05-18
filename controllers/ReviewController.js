@@ -20,7 +20,11 @@ const findOne = async (req, res, next) => {
 
 const create = async (req, res, next) => {
   try {
-    const review = await reviewService.create(req.body);
+    const params = {
+      user_id: req.loggedUser.id,
+      body: req.body,
+    };
+    const review = await reviewService.create(params);
     res.status(201).json(review);
   } catch (error) {
     next(error);

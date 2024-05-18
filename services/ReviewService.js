@@ -16,10 +16,28 @@ const findOne = async (params) => {
 };
 
 const create = async (params) => {
-  const { body } = params;
+  const { user_id, body } = params;
+  const { rating, comments, product_id } = body;
+
+  const foundProduct = await prisma.products.findUnique({
+    where: {
+      id: +product_id,
+    },
+  });
+
+  if (!foundProduct) {
+    throw { name: "ErrorNotFound", message: "Product not found" };
+  }
+
   const review = await prisma.reviews.create({
     data: {
-      ...body,
+      user_id,
+      rating,
+      comments,
+      product_id: foundProduct.id,
+    },
+    include: {
+      product: true,
     },
   });
   return review;
