@@ -15,6 +15,7 @@ const reviewRoute = require("./ReviewRoute");
 const storeRoute = require("./StoreRoute");
 const userRoute = require("./UserRoute");
 const wishlistRoute = require("./WishlistRoute");
+const cartItemsRoute = require("./CartItemsRoute");
 
 // route list cms
 const categoryCmsRoute = require("./cms/CategoryRoute");
@@ -29,7 +30,8 @@ router.use(
   "/api/v1/images",
   express.static(path.join(__dirname, "../public/uploads"))
 );
-router.use(authentication);
+// router.use(authentication);
+router.use("/api/v1/cart-items", cartItemsRoute);
 router.use("/api/v1/addresses", addressRoute);
 router.use("/api/v1/carts", cartRoute);
 router.use("/api/v1/categories", categoryRoute);
