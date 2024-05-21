@@ -86,6 +86,12 @@ const findAll = async (params) => {
             product: true,
           },
         },
+        user: {
+          select: {
+            fullname: true,
+            email: true,
+          },
+        },
       },
     }),
     prisma.orders.count({
