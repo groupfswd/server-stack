@@ -44,6 +44,11 @@ const errorHandler = (err, req, res, next) => {
       name: "InvalidOrderAction",
       message: err.message || "Invalid Order Action",
     });
+  } else if (err.name === "UserExist") {
+    res.status(409).json({
+      name: "UserExist",
+      message: err.message || "User Already Exist",
+    });
   } else {
     res.status(500).json({ message: "Internal Server Error" });
   }
