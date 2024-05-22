@@ -28,6 +28,7 @@ const create = async (params) => {
       city_id: params.city_id,
       name: params.name,
       bank_name: params.bank_name,
+      bank_account: +params.bank_account,
       street_address: params.street_address,
       province: params.province,
       postal_code: +params.postal_code,
