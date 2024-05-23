@@ -6,7 +6,6 @@ const findAll = async (params) => {
     let {
         category_id,
         search,
-        status,
         price,
         min_price,
         max_price,
@@ -51,10 +50,8 @@ const findAll = async (params) => {
             ]
         }
     
-    if(status){
-        statusFilter = {
-            status: 'active'
-        }
+    statusFilter = {
+        status: 'active'
     }
 
     if (price)
