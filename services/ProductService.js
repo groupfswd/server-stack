@@ -8,6 +8,8 @@ const findAll = async (params) => {
         search,
         status,
         price,
+        min_price,
+        max_price,
         weight,
         page,
         limit
@@ -22,6 +24,8 @@ const findAll = async (params) => {
     let searchFilter = {};
     let statusFilter = {};
     let priceFilter = {};
+    let minPriceFilter = {};
+    let maxPriceFilter = {};
     let weightFilter = {};
 
     if (category_id)
@@ -58,6 +62,20 @@ const findAll = async (params) => {
             price: +price
         }
 
+    if (min_price)
+        minPriceFilter = {
+            price: {
+                gt: +min_price
+            }
+        }
+
+    if (max_price)
+        maxPriceFilter = {
+            price: {
+                lt: +max_price
+            }
+        }
+
     if (weight)
         weightFilter = {
             weight: +weight
@@ -68,6 +86,8 @@ const findAll = async (params) => {
         ...searchFilter,
         ...statusFilter,
         ...priceFilter,
+        ...minPriceFilter,
+        ...maxPriceFilter,
         ...weightFilter
     }
 
