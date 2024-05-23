@@ -1,4 +1,3 @@
-const e = require("express");
 const prisma = require("../lib/prisma");
 const axios = require("axios");
 
@@ -158,8 +157,41 @@ const getShippingCost = async (params) => {
   return cost_lists;
 };
 
+const resetCart = async (params) => {
+  return prisma.carts.update({
+    where: {
+      user_id: params.loggedUser.id,
+    },
+    data: {
+      cart_items: {
+        deleteMany: {}
+      }
+    },
+  });
+};
+
+const deleteCartItem = async (params) => {
+  const findUser = await prisma.users.findUnique({
+    where: {
+      id: params.userId
+    },
+    include:{
+      cart: true
+    }
+  })
+
+  return prisma.cart_items.deleteMany({
+    where: {
+      product_id: params.productId,
+      cart_id: findUser.cart.id
+    },
+  });
+};
+
 module.exports = {
   findOne,
   update,
   getShippingCost,
+  resetCart,
+  deleteCartItem,
 };
