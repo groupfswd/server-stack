@@ -188,6 +188,16 @@ describe("Review Feature", () => {
     expect(response.body).toHaveProperty("id");
   });
 
+  it("should return error if review not found", async () => {
+    const response = await request(app)
+      .get(`${BASE_URL}/reviews/100`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect("Content-Type", /json/)
+      .expect(404);
+
+    expect(response.body).toHaveProperty("message");
+  });
+
   it("should create a review", async () => {
     const mockData = {
       product_id: 1,
@@ -239,6 +249,23 @@ describe("Review Feature", () => {
     expect(response.body).toHaveProperty("rating");
   });
 
+  it("should return error review id for update not found", async () => {
+    const mockData = {
+      product_id: 1,
+      rating: 5,
+      comments: "Update Review",
+    };
+
+    const response = await request(app)
+      .put(`${BASE_URL}/reviews/100`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .send(mockData)
+      .expect("Content-Type", /json/)
+      .expect(404);
+
+    expect(response.body).toHaveProperty("message");
+  });
+
   it("should delete a review", async () => {
     const response = await request(app)
       .delete(`${BASE_URL}/reviews/2`)
@@ -247,5 +274,15 @@ describe("Review Feature", () => {
       .expect(200);
 
     expect(response.body).toHaveProperty("comments");
+  });
+
+  it("should return error review id for delete not found", async () => {
+    const response = await request(app)
+      .delete(`${BASE_URL}/reviews/100`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect("Content-Type", /json/)
+      .expect(404);
+
+    expect(response.body).toHaveProperty("message");
   });
 });

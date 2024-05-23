@@ -1,6 +1,6 @@
 const prisma = require("../lib/prisma");
 
-const findAll = async (params) => {
+const findAll = async () => {
   const reviews = await prisma.reviews.findMany();
   return reviews;
 };
@@ -12,6 +12,11 @@ const findOne = async (params) => {
       id: parseInt(id),
     },
   });
+
+  if (!review) {
+    throw { name: "ErrorNotFound", message: "Review not found" };
+  }
+
   return review;
 };
 
@@ -47,6 +52,16 @@ const update = async (params) => {
   const { id, body } = params;
   const { rating, comments } = body;
 
+  const foundReview = await prisma.reviews.findUnique({
+    where: {
+      id: parseInt(id),
+    },
+  });
+
+  if (!foundReview) {
+    throw { name: "ErrorNotFound", message: "Review not found" };
+  }
+
   const review = await prisma.reviews.update({
     where: {
       id: parseInt(id),
@@ -61,6 +76,16 @@ const update = async (params) => {
 
 const destroy = async (params) => {
   const { id } = params;
+  const foundReview = await prisma.reviews.findUnique({
+    where: {
+      id: parseInt(id),
+    },
+  });
+
+  if (!foundReview) {
+    throw { name: "ErrorNotFound", message: "Review not found" };
+  }
+
   const review = await prisma.reviews.delete({
     where: {
       id: parseInt(id),
