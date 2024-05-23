@@ -46,15 +46,15 @@ const update = async (params) => {
         where: { id: currentProduct.product_id },
       });
       if (!foundProduct) {
-        throw { name: "ErrorNotFound" };
+        throw {name: "ErrorNotFound", message: "Product not found"};
       }
 
       if (foundProduct.stock < currentProduct.quantity) {
-        throw { name: "StockInsufficient" };
+        throw {name: "InsufficientStock", message: "Insufficient Stock"};
       }
 
       if (foundProduct.price !== +currentProduct.price) {
-        throw { name: "InvalidPrice" };
+        throw {name: "InvalidPrice", message: "Invalid Price"};
       }
 
       const currentWeight = foundProduct.weight * currentProduct.quantity;
@@ -135,7 +135,7 @@ const getShippingCost = async (params) => {
   });
 
   if (!["jne", "pos", "tiki"].includes(courier)) {
-    throw { name: ErrorNotFound, message: "Courier not found" };
+    throw { name: "ErrorNotFound", message: "Courier not found" };
   }
 
   const shipping_cost = await axios({
@@ -157,8 +157,50 @@ const getShippingCost = async (params) => {
   return cost_lists;
 };
 
+const resetCart = async (params) => {
+  await prisma.carts.update({
+    where: {
+      user_id: params.loggedUser.id,
+    },
+    data: {
+      cart_items: {
+        deleteMany: {}
+      }
+    },
+  });
+
+  return { message: "Cart has been reset" };
+};
+
+const deleteCartItem = async (params) => {
+  const findUser = await prisma.users.findUnique({
+    where: {
+      id: params.userId
+    },
+    include:{
+      cart: true
+    }
+  })
+
+  const foundProduct = await prisma.products.findUnique({
+    where: { id: params.productId },
+  });
+  if (!foundProduct) {
+    throw {name: "ErrorNotFound", message: "Product not found"};
+  }
+
+  return prisma.cart_items.deleteMany({
+    where: {
+      product_id: params.productId,
+      cart_id: findUser.cart.id
+    },
+  });
+};
+
 module.exports = {
   findOne,
   update,
   getShippingCost,
+  resetCart,
+  deleteCartItem,
 };

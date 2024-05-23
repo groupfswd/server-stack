@@ -32,8 +32,33 @@ const getShippingCost = async (req, res, next) => {
   }
 };
 
+const reset = async (req, res, next) => {
+  try {
+    const cart = await cartService.resetCart({
+      loggedUser: { id: req.loggedUser.id },
+    });
+    return res.json(cart);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deleteItem = async (req, res, next) => {
+  try {
+    const cartItem = await cartService.deleteCartItem({
+      productId: req.body.product_id,
+      userId: req.loggedUser.id,
+    });
+    return res.json(cartItem);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   findOne,
   update,
   getShippingCost,
+  reset,
+  deleteItem,
 };
