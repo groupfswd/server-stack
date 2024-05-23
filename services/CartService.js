@@ -158,7 +158,7 @@ const getShippingCost = async (params) => {
 };
 
 const resetCart = async (params) => {
-  return prisma.carts.update({
+  await prisma.carts.update({
     where: {
       user_id: params.loggedUser.id,
     },
@@ -168,6 +168,8 @@ const resetCart = async (params) => {
       }
     },
   });
+
+  return { message: "Cart has been reset" };
 };
 
 const deleteCartItem = async (params) => {
@@ -179,6 +181,13 @@ const deleteCartItem = async (params) => {
       cart: true
     }
   })
+
+  const foundProduct = await prisma.products.findUnique({
+    where: { id: params.productId },
+  });
+  if (!foundProduct) {
+    throw {name: "ErrorNotFound", message: "Product not found"};
+  }
 
   return prisma.cart_items.deleteMany({
     where: {

@@ -165,6 +165,46 @@ describe("Cart Feature", () => {
 
     expect(response.body).toHaveProperty("message");
   });
+
+  it("should return error if the product not found in cart item", async () => {
+    const mockData = {
+      product_id: 100,
+    };
+
+    const response = await request(app)
+      .delete(`${BASE_URL}/carts/cart_items`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .send(mockData)
+      .expect("Content-Type", /json/)
+      .expect(404);
+
+    expect(response.body).toHaveProperty("message");
+  });
+
+  it("should delete the cart item", async () => {
+    const mockData = {
+      product_id: 2,
+    };
+
+    const response = await request(app)
+      .delete(`${BASE_URL}/carts/cart_items`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .send(mockData)
+      .expect("Content-Type", /json/)
+      .expect(200);
+
+    expect(response.body).toHaveProperty("count");
+  });
+
+  it("should reset the cart", async () => {
+    const response = await request(app)
+      .delete(`${BASE_URL}/carts`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect("Content-Type", /json/)
+      .expect(200);
+
+    expect(response.body).toHaveProperty("message");
+  });
 });
 
 describe("Review Feature", () => {
