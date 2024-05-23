@@ -1,3 +1,4 @@
+const e = require("express");
 const prisma = require("../lib/prisma");
 const axios = require("axios");
 
@@ -46,15 +47,15 @@ const update = async (params) => {
         where: { id: currentProduct.product_id },
       });
       if (!foundProduct) {
-        throw { name: "ErrorNotFound" };
+        throw {name: "ErrorNotFound", message: "Product not found"};
       }
 
       if (foundProduct.stock < currentProduct.quantity) {
-        throw { name: "StockInsufficient" };
+        throw {name: "InsufficientStock", message: "Insufficient Stock"};
       }
 
       if (foundProduct.price !== +currentProduct.price) {
-        throw { name: "InvalidPrice" };
+        throw {name: "InvalidPrice", message: "Invalid Price"};
       }
 
       const currentWeight = foundProduct.weight * currentProduct.quantity;
@@ -135,7 +136,7 @@ const getShippingCost = async (params) => {
   });
 
   if (!["jne", "pos", "tiki"].includes(courier)) {
-    throw { name: ErrorNotFound, message: "Courier not found" };
+    throw { name: "ErrorNotFound", message: "Courier not found" };
   }
 
   const shipping_cost = await axios({
