@@ -17,8 +17,14 @@ model Categories {
   id         Int        @id @default(autoincrement())
   products   Products[]
   name       String?
+  status     StatusCategory @default(active)
   created_at DateTime   @default(now())
   updated_at DateTime   @default(now()) @updatedAt
+}
+
+enum StatusCategory {
+  active
+  inactive
 }
 
 model Products {

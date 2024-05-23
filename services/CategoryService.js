@@ -1,7 +1,11 @@
 const prisma = require("../lib/prisma");
 
 const findAll = async () => {
-  const data = await prisma.categories.findMany();
+  const data = await prisma.categories.findMany({
+    where: {
+      status: 'active'
+    }
+  });
   return data;
 };
 
@@ -46,9 +50,12 @@ const update = async (id, params) => {
 
 const destroy = async (params) => {
   await findOne(+params);
-  const data = await prisma.categories.delete({
+  const data = await prisma.categories.update({
     where: {
       id: +params
+    },
+    data:{
+      status: 'inactive'
     }
   })
   return data;
