@@ -7,7 +7,13 @@ const findOne = async (params) => {
       user_id: params.loggedUser.id,
     },
     include: {
-      cart_items: true,
+      cart_items: {
+        include: {
+          product: true,
+        },
+      },
+
+      store: true,
     },
   });
   return cart;

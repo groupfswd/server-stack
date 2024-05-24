@@ -3,9 +3,6 @@ const wishlistService = require("../services/WishlistService");
 const findAll = async (req, res, next) => {
   try {
     const data = await wishlistService.findAll(req.loggedUser);
-
-    console.log(data.length, "data length");
-    console.log(data[data.length - 1].id, "data");
     res.status(200).json({ message: "Get All Wishlists Successful", data });
   } catch (err) {
     next(err);
@@ -28,9 +25,6 @@ const create = async (req, res, next) => {
       user: req.loggedUser.id,
       product: req.body.product_id,
     };
-
-    console.log(params, "params");
-    console.log(typeof params);
 
     const data = await wishlistService.create(params);
 
