@@ -6,6 +6,9 @@ const findAll = async (params) => {
     where: {
       user_id: user_id,
     },
+    include: {
+      city: true,
+    },
   });
 
   return addresses;
@@ -17,6 +20,9 @@ const findOne = async (params) => {
     where: {
       id: +id,
       user_id,
+    },
+    include: {
+      city: true,
     },
   });
 
