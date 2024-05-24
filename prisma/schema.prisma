@@ -131,6 +131,7 @@ model Orders {
   user_id         Int
   store           Stores        @relation(fields: [store_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   store_id        Int
+  address         Int?
   shipping_cost   Int?
   shipping_method String?
   payment_receipt String?
