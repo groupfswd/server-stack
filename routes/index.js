@@ -25,6 +25,7 @@ const userCmsRoute = require("./cms/UserRoute");
 
 router.use("/api/v1/auth", authRoute);
 router.use("/api/v1/products", productRoute);
+router.use("/api/v1/reviews", reviewRoute);
 router.use(
   "/api/v1/images",
   express.static(path.join(__dirname, "../public/uploads"))
@@ -35,7 +36,6 @@ router.use("/api/v1/carts", cartRoute);
 router.use("/api/v1/categories", categoryRoute);
 router.use("/api/v1/cities", cityRoute);
 router.use("/api/v1/orders", orderRoute);
-router.use("/api/v1/reviews", reviewRoute);
 router.use("/api/v1/stores", storeRoute);
 router.use("/api/v1/users", userRoute);
 router.use("/api/v1/wishlists", wishlistRoute);

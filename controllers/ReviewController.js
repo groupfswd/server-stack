@@ -2,7 +2,8 @@ const reviewService = require("../services/ReviewService");
 
 const findAll = async (req, res, next) => {
   try {
-    const review = await reviewService.findAll();
+    const id = +req.query.id;
+    const review = await reviewService.findAll(id);
     res.status(200).json(review);
   } catch (error) {
     next(error);
