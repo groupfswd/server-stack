@@ -6,6 +6,6 @@ router.get("/", orderController.findAll);
 router.get("/:id", orderController.findOne);
 router.post("/", orderController.create);
 router.put("/:id", orderController.update);
-router.post("/:id", multer, orderController.pay);
+router.post("/upload", multer, orderController.upload);
 
 module.exports = router;

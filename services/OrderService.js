@@ -2,6 +2,7 @@ const prisma = require("../lib/prisma");
 const { sendInvoiceEmail } = require("../lib/nodemailer");
 const { createPdf } = require("../lib/pdfkit");
 const paginate = require("../lib/pagination.js");
+require("dotenv").config();
 const SORT_LIST = [
   "created_at desc",
   "created_at asc",
@@ -18,9 +19,11 @@ const findAll = async (params) => {
   let take = limit;
   let sortOption = {};
 
+  console.log(sort_by, "sort_by");
   if (sort_by) {
     if (SORT_LIST.includes(sort_by)) {
       const sorts = sort_by.split(" ");
+      console.log(sorts, "sorts");
       sortOption[sorts[0]] = sorts[1];
     } else {
       throw { name: "InvalidSort" };
@@ -114,6 +117,18 @@ const findOne = async (params) => {
           product: true,
         },
       },
+      store: {
+        include: {
+          city: true,
+        },
+      },
+      user: {
+        select: {
+          fullname: true,
+          email: true,
+          phone_number: true,
+        },
+      },
     },
   });
   return data;
@@ -121,8 +136,14 @@ const findOne = async (params) => {
 
 const create = async (params) => {
   const { user, payload } = params;
-  const { store_id, shipping_cost, shipping_method, courier, order_items } =
-    payload;
+  const {
+    store_id,
+    shipping_cost,
+    shipping_method,
+    courier,
+    order_items,
+    address,
+  } = payload;
 
   return prisma.$transaction(async (tx) => {
     let order = await tx.orders.create({
@@ -132,6 +153,7 @@ const create = async (params) => {
         shipping_cost: +shipping_cost,
         shipping_method,
         courier,
+        address,
       },
     });
 
@@ -212,16 +234,18 @@ const create = async (params) => {
 };
 
 const update = async (params) => {
-  const { id, status } = params;
+  const { id, body } = params;
+  console.log(body, "<<<<<<<");
   const allowedStatus = [
     "cancelled",
+    "waiting_approval",
     "approved",
     "shipping",
     "delivered",
     "completed",
   ];
 
-  if (!allowedStatus.includes(status)) {
+  if (!allowedStatus.includes(body.status)) {
     throw { name: "InvalidOrderAction", message: "Invalid Status" };
   }
   const foundOrder = await prisma.orders.findUnique({
@@ -232,66 +256,58 @@ const update = async (params) => {
 
   if (!foundOrder) throw { name: "ErrorNotFound", message: "Order Not Found" };
 
-  checkStatus({ status, foundOrder });
+  const data = checkStatus(body, foundOrder);
+  console.log(data, "<<<<<<<");
 
   const order = await prisma.orders.update({
     where: {
       id: foundOrder.id,
     },
-    data: {
-      status,
-    },
+    data: data,
   });
 
   return order;
 };
 
-const checkStatus = ({ status, foundOrder }) => {
-  if (status === "cancelled") {
+const checkStatus = (body, foundOrder) => {
+  console.log(body, "<<<<<<<");
+  if (body.status === "cancelled") {
     if (!["waiting_payment", "waiting_approval"].includes(foundOrder.status))
       throw { name: "InvalidOrderAction", message: "Cannot cancel order" };
-  } else if (status === "approved") {
+  } else if (body.status === "waiting_approval") {
+    const params = {
+      status: body.status,
+      paid_at: new Date(),
+      payment_receipt: body.image_url,
+    };
+    return params;
+  } else if (body.status === "approved") {
     if (!["waiting_approval"].includes(foundOrder.status))
       throw { name: "InvalidOrderAction", message: "Cannot approve order" };
-  } else if (status === "shipping") {
+  } else if (body.status === "shipping") {
     if (!["approved"].includes(foundOrder.status))
       throw { name: "InvalidOrderAction", message: "Cannot ship order" };
-  } else if (status === "delivered") {
+  } else if (body.status === "delivered") {
     if (!["shipping"].includes(foundOrder.status))
       throw { name: "InvalidOrderAction", message: "Cannot deliver order" };
-  } else if (status === "completed") {
+  } else if (body.status === "completed") {
     if (!["delivered"].includes(foundOrder.status))
       throw { name: "InvalidOrderAction", message: "Cannot complete order" };
   }
+
+  return body;
 };
 
-const pay = async (params) => {
-  const { id, file } = params;
-  console.log(file, "<<<<<<<");
+const upload = async (file) => {
+  if (file) {
+    const url = `${process.env.BASE_URL}/api/v1/images/${file.filename}`;
 
-  const updatedOrder = await prisma.orders.update({
-    where: {
-      id: +id,
-    },
-    data: {
-      payment_receipt: file.path,
-      status: "waiting_approval",
-    },
-  });
-
-  console.log(updatedOrder);
-
-  //   })
-  //    if (file) {
-  //      const url = `${process.env.BASE_URL}/api/v1/images/${file.filename}`;
-
-  //      return url;
-  //    } else {
-  //      throw {
-  //        name: "MissingFile",
-  //      };
-  //    }
-  // };
+    return url;
+  } else {
+    throw {
+      name: "MissingFile",
+    };
+  }
 };
 
 module.exports = {
@@ -299,5 +315,5 @@ module.exports = {
   findOne,
   create,
   update,
-  pay,
+  upload,
 };

@@ -47,7 +47,7 @@ const update = async (req, res, next) => {
   try {
     const params = {
       id: req.params.id,
-      status: req.body.status,
+      body: req.body,
     };
     const data = await orderService.update(params);
     res.status(200).json({ message: "Update Success", data: data });
@@ -56,17 +56,10 @@ const update = async (req, res, next) => {
   }
 };
 
-const pay = async (req, res, next) => {
+const upload = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const file = req.file;
-
-    const params = {
-      id,
-      file,
-    };
-    const data = await orderService.pay(params);
-    res.status(200).json({ message: "Payment Uploaded", data });
+    const url = await orderService.upload(req.file);
+    res.status(201).json({ message: "Successfully Upload Photo", image: url });
   } catch (err) {
     next(err);
   }
@@ -77,5 +70,5 @@ module.exports = {
   findOne,
   create,
   update,
-  pay,
+  upload,
 };

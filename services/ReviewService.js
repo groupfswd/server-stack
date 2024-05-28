@@ -1,7 +1,12 @@
 const prisma = require("../lib/prisma");
 
-const findAll = async () => {
-  const reviews = await prisma.reviews.findMany();
+const findAll = async (params) => {
+  const id = params;
+  const reviews = await prisma.reviews.findMany({
+    where: {
+      product_id: id,
+    },
+  });
   return reviews;
 };
 

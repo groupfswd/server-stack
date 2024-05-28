@@ -13,7 +13,11 @@ const findOne = async (params) => {
         },
       },
 
-      store: true,
+      store: {
+        include: {
+          city: true,
+        },
+      },
     },
   });
   return cart;
@@ -52,15 +56,15 @@ const update = async (params) => {
         where: { id: currentProduct.product_id },
       });
       if (!foundProduct) {
-        throw {name: "ErrorNotFound", message: "Product not found"};
+        throw { name: "ErrorNotFound", message: "Product not found" };
       }
 
       if (foundProduct.stock < currentProduct.quantity) {
-        throw {name: "InsufficientStock", message: "Insufficient Stock"};
+        throw { name: "InsufficientStock", message: "Insufficient Stock" };
       }
 
       if (foundProduct.price !== +currentProduct.price) {
-        throw {name: "InvalidPrice", message: "Invalid Price"};
+        throw { name: "InvalidPrice", message: "Invalid Price" };
       }
 
       const currentWeight = foundProduct.weight * currentProduct.quantity;
@@ -170,8 +174,8 @@ const resetCart = async (params) => {
     },
     data: {
       cart_items: {
-        deleteMany: {}
-      }
+        deleteMany: {},
+      },
     },
   });
 
@@ -181,24 +185,24 @@ const resetCart = async (params) => {
 const deleteCartItem = async (params) => {
   const findUser = await prisma.users.findUnique({
     where: {
-      id: params.userId
+      id: params.userId,
     },
-    include:{
-      cart: true
-    }
-  })
+    include: {
+      cart: true,
+    },
+  });
 
   const foundProduct = await prisma.products.findUnique({
     where: { id: params.productId },
   });
   if (!foundProduct) {
-    throw {name: "ErrorNotFound", message: "Product not found"};
+    throw { name: "ErrorNotFound", message: "Product not found" };
   }
 
   return prisma.cart_items.deleteMany({
     where: {
       product_id: params.productId,
-      cart_id: findUser.cart.id
+      cart_id: findUser.cart.id,
     },
   });
 };

@@ -123,6 +123,7 @@ model Stores {
   name           String?
   bank_name      String?
   bank_account   String?
+  phone_number   String?
   street_address String?
   province       String?
   postal_code    Int?
@@ -145,6 +146,7 @@ model Orders {
   total_weight    Int?
   total_price     Int?
   courier         String?
+  no_resi         String?
   status          Status?       @default(waiting_payment)
   delivered_at    DateTime?
   invoice         String?       
