@@ -54,7 +54,7 @@ const update = async ({ id, data }) => {
       city_id: data.city_id,
       name: data.name,
       bank_name: data.bank_name,
-      bank_account: params.bank_account,
+      bank_account: data.bank_account,
       street_address: data.street_address,
       province: data.province,
       postal_code: +data.postal_code,
