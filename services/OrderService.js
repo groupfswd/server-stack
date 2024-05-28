@@ -19,9 +19,11 @@ const findAll = async (params) => {
   let take = limit;
   let sortOption = {};
 
+  console.log(sort_by, "sort_by");
   if (sort_by) {
     if (SORT_LIST.includes(sort_by)) {
       const sorts = sort_by.split(" ");
+      console.log(sorts, "sorts");
       sortOption[sorts[0]] = sorts[1];
     } else {
       throw { name: "InvalidSort" };
@@ -229,6 +231,7 @@ const create = async (params) => {
 
 const update = async (params) => {
   const { id, body } = params;
+
   const allowedStatus = [
     "cancelled",
     "waiting_approval",
@@ -251,6 +254,7 @@ const update = async (params) => {
 
   const data = checkStatus(body, foundOrder);
 
+
   const order = await prisma.orders.update({
     where: {
       id: foundOrder.id,
@@ -262,6 +266,7 @@ const update = async (params) => {
 };
 
 const checkStatus = (body, foundOrder) => {
+
   if (body.status === "cancelled") {
     if (!["waiting_payment", "waiting_approval"].includes(foundOrder.status))
       throw { name: "InvalidOrderAction", message: "Cannot cancel order" };

@@ -15,8 +15,7 @@ const findAll = async (params) => {
     } = params;
 
     let filterOptions = {
-        where: {
-        }
+        where: {}
     }
 
     let categoriesIdFilter = {};
@@ -24,6 +23,7 @@ const findAll = async (params) => {
     let statusFilter = {};
     let priceFilter = {};
     let minPriceFilter = {};
+    let rangePrice = {};
     let maxPriceFilter = {};
     let weightFilter = {};
 
@@ -34,8 +34,7 @@ const findAll = async (params) => {
 
     if (search)
         searchFilter = {
-            OR: [
-                {
+            OR: [{
                     name: {
                         equals: `%${search}%`,
                         mode: 'insensitive'
@@ -49,7 +48,7 @@ const findAll = async (params) => {
                 }
             ]
         }
-    
+
     statusFilter = {
         status: 'active'
     }
@@ -59,17 +58,25 @@ const findAll = async (params) => {
             price: +price
         }
 
-    if (min_price)
-        minPriceFilter = {
+    if (min_price && max_price)
+        rangePrice = {
             price: {
-                gt: +min_price
+                gte: +min_price,
+                lte: +max_price
             }
         }
 
-    if (max_price)
+    if (min_price && !max_price)
+        minPriceFilter = {
+            price: {
+                gte: +min_price
+            }
+        }
+
+    if (max_price && !min_price)
         maxPriceFilter = {
             price: {
-                lt: +max_price
+                lte: +max_price
             }
         }
 
@@ -85,11 +92,12 @@ const findAll = async (params) => {
         ...priceFilter,
         ...minPriceFilter,
         ...maxPriceFilter,
+        ...rangePrice,
         ...weightFilter
     }
 
     let skip = (page - 1) * limit;
-    
+
     let take = limit;
 
     let [result, count] = await prisma.$transaction([
@@ -106,7 +114,12 @@ const findAll = async (params) => {
         })
     ])
 
-    const data = paginate({result, count, limit, page})
+    const data = paginate({
+        result,
+        count,
+        limit,
+        page
+    })
 
     return data;
 }
@@ -114,7 +127,7 @@ const findAll = async (params) => {
 const findOne = async (params) => {
     const isNumeric = (string) => /^[+-]?\d+(\.\d+)?$/.test(string)
     const filterOption = {}
-    if(isNumeric(params.id) === false){
+    if (isNumeric(params.id) === false) {
         filterOption.where = {
             slug: params.id
         }
@@ -124,7 +137,7 @@ const findOne = async (params) => {
         }
     }
 
-    if(params.status){
+    if (params.status) {
         filterOption.where = {
             ...filterOption.where,
             status: "active"
@@ -139,7 +152,7 @@ const findOne = async (params) => {
             message: "Data Product Not Found"
         }
     }
-    
+
     return product;
 }
 
@@ -149,7 +162,7 @@ const create = async (params) => {
             id: +params.category_id
         }
     })
-    if(!category){
+    if (!category) {
         throw {
             name: "ErrorNotFound",
             message: "Category Not Found"

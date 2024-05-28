@@ -12,6 +12,12 @@ beforeAll(async () => {
     .send({ email: "developer@mail.com", password: "postgres" });
 
   userToken = response.body.accessToken;
+
+  const responseAdmin = await request(app)
+    .post(`${BASE_URL}/auth/login`)
+    .send({ email: "admin@mail.com", password: "postgres" });
+
+  adminToken = responseAdmin.body.accessToken;
 });
 
 afterAll(async () => {
@@ -432,3 +438,105 @@ describe("Review Feature", () => {
     expect(response.body).toHaveProperty("message");
   });
 });
+
+describe('Get users', () => {
+  it('should return all users', (done) => {
+    request(app)
+      .get(`${BASE_URL}/users`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .then((response) => {
+        expect(response.body.message).toBe('Get All Users Successful')
+        expect(response.body.data).toHaveLength(2)
+        done()
+      })
+      .catch((err) => done(err))
+  })
+
+  it('should return user by id', (done) => {
+    request(app)
+      .get(`${BASE_URL}/users/2`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .then((response) => {
+        expect(response.body.message).toBe('Get User By Id Successful')
+        expect(response.body.data).toHaveProperty('id')
+        done()
+      })
+      .catch((err) => done(err))
+  })
+})
+
+describe('Put user', () => {
+  it('should update user', (done) => {
+    request(app)
+      .put(`${BASE_URL}/users`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .then((response) => {
+        expect(response.body.message).toBe('Update User Successful')
+      })
+      .catch((err) => done(err))
+  })
+})
+
+describe('Get users cms', () => {
+  it('should return all users', (done) => {
+    request(app)
+      .get(`${BASE_URL}/cms/users`)
+      .set("Authorization", `Bearer ${adminToken}`)
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .then((response) => {
+        expect(response.body.message).toBe('Get All Users Successful')
+        expect(response.body.data).toHaveLength(2)
+        done()
+      })
+      .catch((err) => done(err))
+  })
+
+  it('should return user by id', (done) => {
+    request(app)
+      .get(`${BASE_URL}/cms/users/1`)
+      .set("Authorization", `Bearer ${adminToken}`)
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .then((response) => {
+        expect(response.body.message).toBe('Get User By Id Successful')
+        expect(response.body.data.id).toEqual(1)
+        done()
+      })
+      .catch((err) => done(err))
+  })
+
+  it('should return error not found user by id', (done) => {
+    request(app)
+      .get(`${BASE_URL}/cms/users/3`)
+      .set("Authorization", `Bearer ${adminToken}`)
+      .expect("Content-Type", /json/)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.message).toBe('Not Found')
+        done()
+      })
+      .catch((err) => done(err))
+  })
+})
+
+describe('Put user cms', () => {
+  it('should update user', (done) => {
+    request(app)
+      .put(`${BASE_URL}/cms/users`)
+      .set("Authorization", `Bearer ${adminToken}`)
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .then((response) => {
+        expect(response.body.message).toBe('Update User Successful')
+        done()
+      })
+      .catch((err) => done(err))
+  })
+})
