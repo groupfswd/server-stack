@@ -19,9 +19,11 @@ const findAll = async (params) => {
   let take = limit;
   let sortOption = {};
 
+  console.log(sort_by, "sort_by");
   if (sort_by) {
     if (SORT_LIST.includes(sort_by)) {
       const sorts = sort_by.split(" ");
+      console.log(sorts, "sorts");
       sortOption[sorts[0]] = sorts[1];
     } else {
       throw { name: "InvalidSort" };
