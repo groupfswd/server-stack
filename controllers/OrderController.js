@@ -65,22 +65,10 @@ const upload = async (req, res, next) => {
   }
 };
 
-const updateItems = async (req, res, next) => {
-  try {
-    const body = req.body;
-    console.log(body, "body");
-    const data = await orderService.updateOrderItems(body);
-    res.status(200).json({ message: "Update Success", data: data });
-  } catch (err) {
-    next(err);
-  }
-};
-
 module.exports = {
   findAll,
   findOne,
   create,
   update,
   upload,
-  updateItems,
 };

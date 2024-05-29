@@ -7,6 +7,5 @@ router.get("/:id", orderController.findOne);
 router.post("/", orderController.create);
 router.put("/:id", orderController.update);
 router.post("/upload", multer, orderController.upload);
-router.put("/order_items", orderController.updateItems);
 
 module.exports = router;
