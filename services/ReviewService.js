@@ -6,6 +6,13 @@ const findAll = async (params) => {
     where: {
       product_id: id,
     },
+    include: {
+      user: {
+        select: {
+          fullname: true,
+        },
+      },
+    },
   });
   return reviews;
 };
@@ -15,6 +22,13 @@ const findOne = async (params) => {
   const review = await prisma.reviews.findUnique({
     where: {
       id: parseInt(id),
+    },
+    include: {
+      user: {
+        select: {
+          fullname: true,
+        },
+      },
     },
   });
 
