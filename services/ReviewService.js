@@ -2,9 +2,16 @@ const prisma = require("../lib/prisma");
 
 const findAll = async (params) => {
   const data = params;
-  console.log(data);
   const reviews = await prisma.reviews.findMany({
     where: data,
+    include: {
+      user: {
+        select: {
+          fullname: true,
+        },
+      },
+    },
+
   });
   return reviews;
 };
@@ -14,6 +21,13 @@ const findOne = async (params) => {
   const review = await prisma.reviews.findUnique({
     where: {
       id: parseInt(id),
+    },
+    include: {
+      user: {
+        select: {
+          fullname: true,
+        },
+      },
     },
   });
 
