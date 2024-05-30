@@ -26,7 +26,7 @@ const findOne = async (params) => {
 
 const create = async (params) => {
   const { user_id, body } = params;
-  const { rating, comments, product_id, item_id } = body;
+  const { rating, comments, product_id, order_item_id } = body;
 
   const foundProduct = await prisma.products.findUnique({
     where: {
@@ -43,7 +43,7 @@ const create = async (params) => {
       user_id,
       rating,
       comments,
-      item_id,
+      order_item_id,
       product_id: foundProduct.id,
     },
     include: {

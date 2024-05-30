@@ -75,17 +75,17 @@ enum Role {
 }
 
 model Reviews {
-  id         Int         @id @default(autoincrement())
-  user       Users       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user_id    Int
-  product    Products    @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  product_id Int
-  item_id    Int?         @unique
-  order_item Order_Items? @relation(fields: [item_id], references: [id])
-  rating     Int?
-  comments   String?
-  created_at DateTime    @default(now())
-  updated_at DateTime    @default(now()) @updatedAt
+  id               Int         @id @default(autoincrement())
+  user             Users       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id          Int
+  product          Products    @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product_id       Int
+  order_item_id    Int?         @unique
+  order_item       Order_Items? @relation(fields: [order_item_id], references: [id])
+  rating           Int?
+  comments         String?
+  created_at       DateTime    @default(now())
+  updated_at       DateTime    @default(now()) @updatedAt
 }
 
 model Cart_items {
@@ -140,7 +140,8 @@ model Orders {
   user_id         Int
   store           Stores        @relation(fields: [store_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   store_id        Int
-  address         Int?
+  addresses       Addresses?    @relation(fields: [address_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  address_id      Int?          
   shipping_cost   Int?
   shipping_method String?
   payment_receipt String?
@@ -149,6 +150,7 @@ model Orders {
   total_price     Int?
   courier         String?
   no_resi         String?
+  estimated_day   String?
   status          Status?       @default(waiting_payment)
   delivered_at    DateTime?
   invoice         String?       
@@ -190,6 +192,7 @@ model Addresses {
   street_address String?
   province       String?
   postal_code    Int?
+  Order          Orders[]
   created_at     DateTime @default(now())
   updated_at     DateTime @default(now()) @updatedAt
 }

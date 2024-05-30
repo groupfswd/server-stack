@@ -32,8 +32,8 @@ const findOne = async (req, res, next) => {
 const update = async (req, res, next) => {
   try {
     const params = {
-      id: +req.params.id,
-      status: req.body.status,
+      id: req.params.id,
+      body: req.body,
     };
     const data = await orderService.update(params);
     res.status(200).json({ message: "Update Success", data: data });
