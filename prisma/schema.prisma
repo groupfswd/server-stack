@@ -75,15 +75,17 @@ enum Role {
 }
 
 model Reviews {
-  id         Int      @id @default(autoincrement())
-  user       Users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id         Int         @id @default(autoincrement())
+  user       Users       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user_id    Int
-  product    Products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product    Products    @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   product_id Int
+  item_id    Int?         @unique
+  order_item Order_Items? @relation(fields: [item_id], references: [id])
   rating     Int?
   comments   String?
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  created_at DateTime    @default(now())
+  updated_at DateTime    @default(now()) @updatedAt
 }
 
 model Cart_items {
@@ -163,6 +165,7 @@ model Order_Items {
   quantity    Int?
   price       Int?
   is_reviewed Boolean  @default(false)
+  review      Reviews?  
   created_at  DateTime @default(now())
   updated_at  DateTime @default(now()) @updatedAt
 }
