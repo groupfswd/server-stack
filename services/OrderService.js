@@ -138,7 +138,8 @@ const create = async (params) => {
     shipping_method,
     courier,
     order_items,
-    address,
+    address_id,
+    estimated_day,
   } = payload;
 
   return prisma.$transaction(async (tx) => {
@@ -149,7 +150,8 @@ const create = async (params) => {
         shipping_cost: +shipping_cost,
         shipping_method,
         courier,
-        address,
+        address_id,
+        estimated_day,
       },
     });
 
@@ -248,12 +250,18 @@ const update = async (params) => {
     where: {
       id: +id,
     },
+    include: {
+      order_items: {
+        include: {
+          product: true,
+        },
+      },
+    },
   });
 
   if (!foundOrder) throw { name: "ErrorNotFound", message: "Order Not Found" };
 
   const data = checkStatus(body, foundOrder);
-
 
   const order = await prisma.orders.update({
     where: {
@@ -262,11 +270,34 @@ const update = async (params) => {
     data: data,
   });
 
+  if (data.status === "shipping") {
+    const updateStockPromises = foundOrder.order_items.map(async (item) => {
+      const product = await prisma.products.findUnique({
+        where: {
+          id: item.product_id,
+        },
+      });
+      if (product && product.stock >= item.quantity) {
+        await prisma.products.update({
+          where: {
+            id: item.product_id,
+          },
+          data: {
+            stock: {
+              decrement: item.quantity,
+            },
+          },
+        });
+      }
+    });
+
+    await Promise.all(updateStockPromises);
+  }
+
   return order;
 };
 
 const checkStatus = (body, foundOrder) => {
-
   if (body.status === "cancelled") {
     if (!["waiting_payment", "waiting_approval"].includes(foundOrder.status))
       throw { name: "InvalidOrderAction", message: "Cannot cancel order" };
@@ -283,6 +314,11 @@ const checkStatus = (body, foundOrder) => {
   } else if (body.status === "shipping") {
     if (!["approved"].includes(foundOrder.status))
       throw { name: "InvalidOrderAction", message: "Cannot ship order" };
+    const params = {
+      status: body.status,
+      no_resi: body.no_resi,
+    };
+    return params;
   } else if (body.status === "delivered") {
     if (!["shipping"].includes(foundOrder.status))
       throw { name: "InvalidOrderAction", message: "Cannot deliver order" };

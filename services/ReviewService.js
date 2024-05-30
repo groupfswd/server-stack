@@ -1,11 +1,9 @@
 const prisma = require("../lib/prisma");
 
 const findAll = async (params) => {
-  const id = params;
+  const data = params;
   const reviews = await prisma.reviews.findMany({
-    where: {
-      product_id: id,
-    },
+    where: data,
     include: {
       user: {
         select: {
@@ -13,6 +11,7 @@ const findAll = async (params) => {
         },
       },
     },
+
   });
   return reviews;
 };
@@ -41,7 +40,7 @@ const findOne = async (params) => {
 
 const create = async (params) => {
   const { user_id, body } = params;
-  const { rating, comments, product_id } = body;
+  const { rating, comments, product_id, order_item_id } = body;
 
   const foundProduct = await prisma.products.findUnique({
     where: {
@@ -58,6 +57,7 @@ const create = async (params) => {
       user_id,
       rating,
       comments,
+      order_item_id,
       product_id: foundProduct.id,
     },
     include: {
