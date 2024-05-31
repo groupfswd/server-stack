@@ -4,7 +4,7 @@ const findAll = async (req, res, next) => {
   try {
     const query = {};
     if (req.query.item_id) {
-      query.item_id = parseInt(req.query.item_id);
+      query.order_item_id = Number(req.query.item_id);
     } else if (req.query.id) {
       query.id = parseInt(req.query.id);
     }
