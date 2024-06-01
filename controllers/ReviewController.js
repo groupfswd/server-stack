@@ -6,7 +6,7 @@ const findAll = async (req, res, next) => {
     if (req.query.item_id) {
       query.order_item_id = Number(req.query.item_id);
     } else if (req.query.id) {
-      query.id = parseInt(req.query.id);
+      query.product_id = parseInt(req.query.id);
     }
     const review = await reviewService.findAll(query);
     res.status(200).json(review);

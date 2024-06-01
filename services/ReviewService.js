@@ -2,7 +2,6 @@ const prisma = require("../lib/prisma");
 
 const findAll = async (params) => {
   const data = params;
-  console.log(data, "<<<<<<<params>>>>>>>");
   const reviews = await prisma.reviews.findMany({
     where: data,
     include: {
