@@ -205,6 +205,11 @@ const create = async (params) => {
             product: true,
           },
         },
+        addresses: {
+          include: {
+            city: true,
+          },
+        },
       },
     });
 
