@@ -17,7 +17,7 @@ app.use(router);
 
 app.use(errorHandler);
 
-cron.schedule("*/2 * * * *", () => {
+cron.schedule("*/1 * * * *", () => {
   console.log("running a review reminders");
   sendReviweReminders();
 });
